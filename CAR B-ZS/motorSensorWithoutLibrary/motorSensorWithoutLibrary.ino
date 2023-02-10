@@ -205,46 +205,47 @@ void resetCounters(){
 
 void rightAngleRight()
 {
+  IRActive = false;
+  resetCounters(); 
+  carStop();
+  delay(500);
+  
+  while (countLW < 29) {
+  printEncoderMesurements();
   analogWrite(RWF, 0);
   analogWrite(RWB, 0);
   analogWrite(LWF, 255);
-  analogWrite(LWB, 0);
-  if (countLW > 28){
-    carStop();
+  analogWrite(LWB, 0);  
   }
+  
+ resetCounters();
+ IRActive = true;
+ carStop();
+ delay(500);
+ loop();
 }
 
 void rightAngleLeft()
 { 
+   IRActive = false;
+  resetCounters(); 
+  carStop();
+  delay(500);
   
+  while (countRW < 29) {
+  printEncoderMesurements();
   analogWrite(RWF, 255);
   analogWrite(RWB, 0);
   analogWrite(LWF, 0);
   analogWrite(LWB, 0);  
-  if (countRW > 28){
-    carStop();
   }
+  
+ resetCounters();
+ IRActive = true;
+ carStop();
+ delay(500);
+ loop();
 }
-
-/*void turnAround()
-{
-  IRActive = false;
-  resetCounters(); 
-  
-  if((countRW > 26 ) || (countLW > 26)){
-    resetCounters();
-    IRActive = true;
-    exit(0);
-  } else if((countRW <= 26 )|| (countLW <= 26)){ 
-  printEncoderMesurements();
-  analogWrite(RWF, 180);
-  analogWrite(RWB, 0);
-  analogWrite(LWF, 0);
-  analogWrite(LWB, 180);  
-  }
-  
-  
-}*/
 
 void turnAround()
 {
@@ -349,11 +350,11 @@ void followLine() {
     sharpRight();
   }else if((s0 == 0)&&(s1 == 0)&&(s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0) && (s6 == 0) && (s7 == 0)) {
     turnAround(); 
-  }/*else if ((s0 == 1)&&(s1 == 1)&&(s2 == 1) && (s3 == 1) && (s4 == 0) && (s5 == 0) && (s6 == 0) && (s7 == 0)){
-    turnLeft();
-  }else if ((s0 == 0)&&(s1 == 0)&&(s2 == 0) && (s3 == 0) && (s4 == 1) && (s5 == 1) && (s6 == 1) && (s7 == 1)){
-    turnRight();
-  }*/
+  }else if ((s0 == 1)&&(s1 == 1)&&(s2 == 1) && (s3 == 1) && (s4 == 1) && (s5 == 0) && (s6 == 0) && (s7 == 0)){
+    rightAngleLeft();
+  }else if ((s0 == 0)&&(s1 == 0)&&(s2 == 0) && (s3 == 1) && (s4 == 1) && (s5 == 1) && (s6 == 1) && (s7 == 1)){
+    rightAngleRight();
+  }
  }
 }
 
