@@ -30,9 +30,8 @@ int s7m;
 int directionCalc;
 int sensorTreshMark = 800;
 boolean activeLineFollowing = true;
-
-
-
+boolean activeIRReading = true;
+unsigned long time;
 
 //===============================================================================
 
@@ -70,15 +69,17 @@ void setup()
 //======================||IR SENSOR FUNCTIONS||=================================                                               END OF SETUP
 void makeIRReadings()
 {
-
-  s0 = analogRead(IR);
+if(activeIRReading == true)
+{
+ s0 = analogRead(IR);
   s1 = analogRead(IR1);
   s2 = analogRead(IR2);
   s3 = analogRead(IR3);
   s4 = analogRead(IR4);
   s5 = analogRead(IR5);
   s6 = analogRead(IR6);
-  s7 = analogRead(IR7);
+  s7 = analogRead(IR7); 
+}
 
   if (s0 > sensorTreshMark)
   {
@@ -88,7 +89,7 @@ void makeIRReadings()
   else if (s0 <= sensorTreshMark)
   {
     s0 = 0;
-    s0m=0;
+    s0m = 0;
   }
 
   if (s1 > sensorTreshMark)
@@ -143,7 +144,7 @@ void makeIRReadings()
   else if (s5 <= sensorTreshMark)
   {
     s5 = 0;
-    s5m=0;
+    s5m = 0;
   }
 
   if (s6 > sensorTreshMark)
@@ -168,8 +169,7 @@ void makeIRReadings()
     s7m = 0;
   }
 
-directionCalc = s0m + s1m + s2m + s3m + s4m + s5m + s6m + s7m;
-  
+  directionCalc = s0m + s1m + s2m + s3m + s4m + s5m + s6m + s7m;
 }
 
 void printIRReadings()
@@ -198,9 +198,7 @@ void printIRReadings()
 void updateRW()
 {
   noInterrupts();
-
   countRW = countRW + 1;
-
   interrupts();
 }
 
@@ -215,7 +213,6 @@ void updateLW()
 
 void printEncoderMesurements()
 {
-
   Serial.print("Right Wheel: ");
   Serial.print(countRW);
   Serial.print(" , ");
@@ -238,10 +235,9 @@ void turnAround()
 
   resetCounters();
   carStop();
-  delay(500);
+  wait(1000);
 
-
-  while (countLW < 26)
+  while (countLW < 23)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
@@ -249,9 +245,9 @@ void turnAround()
     analogWrite(LWF, 0);
     analogWrite(LWB, 255);
   }
-   resetCounters();
-   
-   while (countLW <= 1)
+  resetCounters();
+
+  while (countLW <= 5)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -259,10 +255,10 @@ void turnAround()
     analogWrite(LWF, 0);
     analogWrite(LWB, 255);
   }
-  
-   resetCounters(); 
-   
-   while (countLW <= 30)
+
+  resetCounters();
+
+  while (countLW <= 25)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -273,30 +269,29 @@ void turnAround()
 
   resetCounters();
   carStop();
-  delay(500);
+  wait(1000);
   loop();
 }
 
 void rightAngleRight()
 {
 
-  
   carStop();
-  delay(500);
+  wait(1000);
   resetCounters();
 
   while (countLW <= 1)
   {
     printEncoderMesurements();
-    analogWrite(RWF, 255);
+    analogWrite(RWF, 230);
     analogWrite(RWB, 0);
-    analogWrite(LWF, 255);
+    analogWrite(LWF, 230);
     analogWrite(LWB, 0);
   }
 
   resetCounters();
 
-  while (countLW < 41)
+  while (countLW < 44)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -307,18 +302,18 @@ void rightAngleRight()
 
   resetCounters();
   carStop();
-  delay(500);
+  wait(1000);
   loop();
 }
 
 void rightAngleLeft()
 {
- 
+
   carStop();
-  delay(500);
+  wait(1000);
   resetCounters();
- 
-    while (countRW <= 1)
+
+  while (countRW <= 1)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
@@ -326,10 +321,7 @@ void rightAngleLeft()
     analogWrite(LWF, 255);
     analogWrite(LWB, 0);
   }
-
   resetCounters();
-  
-  
   while (countRW < 34)
   {
     printEncoderMesurements();
@@ -338,19 +330,16 @@ void rightAngleLeft()
     analogWrite(LWF, 0);
     analogWrite(LWB, 0);
   }
-  
-
   resetCounters();
   carStop();
-  delay(500);
+  wait(1000);
   loop();
 }
 
 void carStopStrong()
 {
   resetCounters();
-  
-    while (countRW <= 3)
+  while (countRW <= 3)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -358,7 +347,6 @@ void carStopStrong()
     analogWrite(LWF, 0);
     analogWrite(LWB, 255);
   }
-  
   resetCounters();
   loop();
 }
@@ -415,53 +403,106 @@ void sharpLeft()
 
 //=====================||END OF LINE FOLLOWING DIRECTION FUNCTIONS||==========================                          END OF LINE FOLLOWING DIRECTION FUNCTIONS
 
+//=====================||INTERSECTION DECISION MAKING FUNCTIONS||============================
+
+void wait(int timeToWait)
+{
+  time = millis();
+  carStop();
+  while(millis() < time+timeToWait);
+}
+
+int waitAndMesure()
+{
+
+  wait(200);
+  
+  s2 = analogRead(IR2);
+  s3 = analogRead(IR3);
+  s4 = analogRead(IR4);
+  s5 = analogRead(IR5);
+  
+  return s2, s3, s4, s5;
+}
+
+//=====================||END OF INTERSECTION DECISION MAKING FUNCTIONS||=====================
+
 //=====================||LINE FOLLOWING FUNCTIONS||===========================================
 
 void followLine()
 {
-  if(activeLineFollowing == true) 
+  if (activeLineFollowing == true)
   {
-      if((s0 == 1) && (s7 == 1))
+    if ((s0 == 1) && (s7 == 1))
+    {
+      rightAngleLeft();
+      // wait 0.1 second
+      // measure again
+      /* if((s0 == 0) && (s7 == 0))
       {
-       rightAngleLeft();
-      //  activeLineFollowing = false;  
+       sharpLeft();
       }
-      else if ((s0 == 0) && (s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0) && (s6 == 0) && (s7 == 0))
+       else if (blackBlock counter == 0)
       {
-        turnAround();
+        startSequence();
+        blackBlockCounter++;
       }
-      else if ((s0 == 1) && (s2 == 1) && (s7 == 0))
+      else if(blackBlockCounter == 1)
       {
-       rightAngleLeft();
+        endSequence();
       }
-      else if ((s7 == 1) && (s5 == 1) && (s0 == 0))
-              
-       {
-         rightAngleRight();
-       }
-      else if ( directionCalc >= -2 && directionCalc <= 2)
-      {
-        forwards();
-      }
-      else if (directionCalc >= -6 && directionCalc <= -3)
-      {
-        slowLeft();
-      }
-      else if (directionCalc <= 6 && directionCalc >= 3)
-      {
-        slowRight();
-      }
-      else if (directionCalc < -6)
-      {
-        sharpLeft();
-      }
-      else if (directionCalc > 6)
-      {
-        sharpRight();
-      }
-  }else
+       */
+
+      //  activeLineFollowing = false;
+    }
+    else if ((s0 == 1) && (s2 == 1) && (s7 == 0))
+    {
+      rightAngleLeft();
+    }
+    else if ((s7 == 1) && (s5 == 1) && (s0 == 0))
+    {
+     // rightAngleRight();
+      activeLineFollowing = false;
+      wait(200);
+    }
+    else if ((s0 == 0) && (s1 == 0) && (s2 == 0) && (s3 == 0) && (s4 == 0) && (s5 == 0) && (s6 == 0) && (s7 == 0))
+    {
+      turnAround();
+    }
+    else if (directionCalc >= -2 && directionCalc <= 2)
+    {
+      forwards();
+    }
+    else if (directionCalc >= -6 && directionCalc <= -3)
+    {
+      slowLeft();
+    }
+    else if (directionCalc <= 6 && directionCalc >= 3)
+    {
+      slowRight();
+    }
+    else if (directionCalc < -6)
+    {
+      sharpLeft();
+    }
+    else if (directionCalc > 6)
+    {
+      sharpRight();
+    }
+  }
+  else
   {
-    carStop();
+    if(s2 == 1 || s3 == 1 || s4 == 1 || s5 == 1)
+      {
+        activeLineFollowing=true;
+        loop();
+      }
+      else if(s3 == 0 || s4 == 0)
+      {
+        rightAngleRight();
+        activeLineFollowing=true;
+        loop();
+      }
   }
 }
 
@@ -474,9 +515,8 @@ void followLine()
 
 void loop()
 {
-
   makeIRReadings();
   printIRReadings();
- // printEncoderMesurements();
+  // printEncoderMesurements();
   followLine();
 }
