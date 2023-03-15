@@ -35,6 +35,7 @@ boolean intersectionDecision = true;
 boolean endCheck = true;
 boolean activeIRReading = true;
 unsigned long time;
+int finishDanceSequenceCounter = 0;
 
 int blackBlockCounter = 0;
 boolean startProgram = true;
@@ -70,7 +71,6 @@ void setup()
   // encoder interrupts
   attachInterrupt(digitalPinToInterrupt(encoderRW), updateRW, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
-  forwards();
 }
 
 //======================||IR SENSOR FUNCTIONS||=================================                                               END OF SETUP
@@ -237,7 +237,6 @@ void resetCounters()
 
 void turnAround()
 {
-
   resetCounters();
   carStop();
   wait(200);
@@ -252,7 +251,7 @@ void turnAround()
   }
   resetCounters();
 
-  while (countLW <= 14)
+  while (countLW <= 19)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -260,7 +259,6 @@ void turnAround()
     analogWrite(LWF, 0);
     analogWrite(LWB, 255);
   }
-
   resetCounters();
 
   while (countLW <= 20)
@@ -281,7 +279,6 @@ void turnAround()
 
 void rightAngleRight()
 {
-
   resetCounters();
   carStop();
   wait(200);
@@ -298,7 +295,7 @@ void rightAngleRight()
   carStop();
   wait(200);
 
-  while (countLW < 35)
+  while (countLW < 34)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -306,7 +303,6 @@ void rightAngleRight()
     analogWrite(LWF, 255);
     analogWrite(LWB, 0);
   }
-
   resetCounters();
   carStop();
   closeGripper();
@@ -330,7 +326,7 @@ void rightAngleLeft()
     analogWrite(LWB, 0);
   }
   resetCounters();
-  while (countRW < 34)
+  while (countRW < 33)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
@@ -346,10 +342,10 @@ void rightAngleLeft()
   loop();
 }
 
-void carStopStrong()
+void carBackwards()
 {
   resetCounters();
-  while (countRW <= 3)
+  while (countRW <= 20)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -511,12 +507,77 @@ void startProgramFun()
   wait(1000);
   closeGripper();
   wait(1000);
-  startProgram = false; 
+  startProgram = false;
   rightAngleLeft();
 }
 
 void endProgramFun()
 {
+  finishDanceSequenceCounter++;
+  if (finishDanceSequenceCounter == 1)
+  {
+    openGripper();
+    resetCounters();
+    while (countRW <= 60) // DANCE Sequence
+    {
+      printEncoderMesurements();
+      analogWrite(RWF, 0);
+      analogWrite(RWB, 255);
+      analogWrite(LWF, 0);
+      analogWrite(LWB, 255);
+    }
+    resetCounters();
+
+    for (int i = 0; i < 5; i++)
+    {
+
+      resetCounters();
+
+      while (countRW <= 45)
+      {
+        printEncoderMesurements();
+        analogWrite(RWF, 255);
+        analogWrite(RWB, 0);
+        analogWrite(LWF, 0);
+        analogWrite(LWB, 255);
+      }
+
+      resetCounters();
+
+      while (countLW <= 45)
+      {
+        printEncoderMesurements();
+        analogWrite(RWF, 0);
+        analogWrite(RWB, 255);
+        analogWrite(LWF, 255);
+        analogWrite(LWB, 0);
+      }
+
+      resetCounters();
+      for (int j = 0; j < 10; j++)
+      {
+        for (int i = 0; i < 10; i++) // Close Grippers
+        {
+          digitalWrite(pinServo, HIGH);
+          delayMicroseconds(1100);
+          digitalWrite(pinServo, LOW);
+          delay(10);
+        }
+
+        for (int i = 0; i < 10; i++) // Open Grippers
+        {
+          digitalWrite(pinServo, HIGH);
+          delayMicroseconds(1600);
+          digitalWrite(pinServo, LOW);
+          delay(10);
+        }
+      }
+    }
+
+    intersectionDecision = false;
+    endCheck = false;
+    loop();
+  }
 }
 
 //=====================||LINE FOLLOWING FUNCTIONS||===========================================
@@ -527,28 +588,11 @@ void followLine()
   {
 
     if (intersectionDecision == true && endCheck == true)
-    {   
+    {
       if ((s0 == 1) && (s7 == 1))
       {
-        rightAngleLeft();
-        // wait 0.1 second
-        // measure again
-        /* if((s0 == 0) && (s7 == 0))
-        {
-         sharpLeft();
-        }
-         else if (blackBlock counter == 0)
-        {
-          startSequence();
-          blackBlockCounter++;
-        }
-        else if(blackBlockCounter == 1)
-        {
-          endSequence();
-        }
-         */
-
-        //  intersectionDecision = false;
+        endCheck = false;
+        wait(200);
       }
       else if ((s0 == 1) && (s2 == 1) && (s7 == 0))
       {
@@ -556,7 +600,6 @@ void followLine()
       }
       else if ((s7 == 1) && (s5 == 1) && (s0 == 0))
       {
-        // rightAngleRight();
         intersectionDecision = false;
         wait(200);
       }
@@ -585,7 +628,7 @@ void followLine()
         sharpRight();
       }
     }
-    else if(intersectionDecision == false && endCheck == true)
+    else if (intersectionDecision == false && endCheck == true)
     {
       if (s2 == 1 || s3 == 1 || s4 == 1 || s5 == 1)
       {
@@ -598,6 +641,29 @@ void followLine()
         intersectionDecision = true;
         loop();
       }
+    }
+    else if (intersectionDecision == true && endCheck == false)
+    {
+      if (s0 == 1 && s1 == 1 && s2 == 1 && s3 == 1 && s4 == 1 && s5 == 1 && s6 == 1 && s7 == 1)
+      {
+
+        endProgramFun();
+      }
+      else if (s2 == 1 || s3 == 1 || s4 == 1 || s5 == 1)
+      {
+        endCheck = true;
+        loop();
+      }
+      else if (s3 == 0 && s4 == 0)
+      {
+        rightAngleLeft();
+        endCheck = true;
+        loop();
+      }
+    }
+    else if (intersectionDecision == false && endCheck == false)
+    {
+      carStop();
     }
   }
   else
