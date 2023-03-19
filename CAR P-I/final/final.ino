@@ -1,4 +1,3 @@
-
 #define RWF 6
 #define RWB 5
 
@@ -16,21 +15,22 @@
 
 float forwardDistance = 0;
 float leftDistance = 0;
-bool goingForward = false;
+
+// might be used in future, WIP
+// bool goingForward = false;
 
 unsigned long countRW = 0;
 unsigned long countLW = 0;
 
-
 void setup()
 {
-
     Serial.begin(9600);
-    pinMode(RWF,OUTPUT);
-    pinMode(RWB,OUTPUT);
-    pinMode(LWF,OUTPUT);
-    pinMode(LWB,OUTPUT);
-    
+
+    pinMode(RWF, OUTPUT);
+    pinMode(RWB, OUTPUT);
+    pinMode(LWF, OUTPUT);
+    pinMode(LWB, OUTPUT);
+
     pinMode(fProxEcho, INPUT);
     pinMode(fProxTrig, OUTPUT);
 
@@ -39,9 +39,9 @@ void setup()
 
     pinMode(encoderRW, INPUT);
     pinMode(encoderLW, INPUT);
+
     attachInterrupt(digitalPinToInterrupt(encoderRW), updateRW, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
-  
 }
 
 //===================================|| MAZE GO STRAIGHT FUNCTION || =======================
@@ -50,13 +50,12 @@ void goForwardToWall()
     if (leftDistance > 9.2)
     {
         analogWrite(RWF, 255);
-        // analogWrite(LWF, 232 - 10 * (leftDistance - 7));
         analogWrite(LWF, 192);
     }
     else if (leftDistance < 7.2)
     {
+        // TODO: should be reviewed as the left wheel is not using max speed
         analogWrite(RWF, 205);
-        // analogWrite(RWF, 255 - 10 * abs(leftDistance - 4));
         analogWrite(LWF, 232);
     }
     else
@@ -65,7 +64,6 @@ void goForwardToWall()
         analogWrite(LWF, 232);
     }
 }
-
 
 //===================================|| END OF MAZE GO STRAIGHT FUNCTION || =======================
 
@@ -86,11 +84,7 @@ void updateLW()
 
 void printEncoderMesurements()
 {
-    Serial.print("Right Wheel: ");
-    Serial.print(countRW);
-    Serial.print(" , ");
-    Serial.print("Left Wheel: ");
-    Serial.println(countLW);
+    Serial.println("Left wheel: " + String(countLW) + ", right wheel:" + String(countRW));
 }
 
 void resetCounters()
@@ -104,10 +98,13 @@ void resetCounters()
 //===================================|| DISTANCE MEASUREMENT SENSORS|| ============================
 void querySensors()
 {
+    // TODO: might be optimised as the sensors always get queried together
     forwardDistance = getForwardDistance();
     leftDistance = getLeftDistance();
 }
 
+// might be renamed as it returns the distance in cm
+// also might be optimised as the sensors always get queried together
 float pulse(int proxTrig, int proxEcho)
 {
     digitalWrite(proxTrig, HIGH);
