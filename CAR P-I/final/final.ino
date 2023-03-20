@@ -28,9 +28,6 @@ int lProxTrig = 8;
 float forwardDistance = 0;
 float leftDistance = 0;
 
-// might be used in future, WIP
-// bool goingForward = false;
-
 unsigned int countRW = 0;
 unsigned int countLW = 0;
 
@@ -65,12 +62,11 @@ void loop()
     goForwardToWall();
 }
 
-//
 // movement functions
 
+void goForwardToWall()
 // the function defines the behaviour of the car when it is going forward
 // it adjusts the car so that it is constantly 8.2 cm away from the wall
-void goForwardToWall()
 {
     if (leftDistance > 9.2)
     {
@@ -90,10 +86,9 @@ void goForwardToWall()
     }
 }
 
-//
 // counter functions
-
 // used to update the counters of the encoders
+
 void updateRW()
 {
     noInterrupts();
@@ -108,8 +103,8 @@ void updateLW()
     interrupts();
 }
 
-// TODO: might be removed as it is not used
 void printEncoderMesurements()
+// TODO: be removed on release
 {
     Serial.println("Left wheel: " + String(countLW) + ", right wheel:" + String(countRW));
 }
@@ -121,16 +116,17 @@ void resetCounters()
 }
 
 // sound sensors functions
+
 void querySensors()
+// TODO: might be optimised as the sensors always get queried together
 {
-    // TODO: might be optimised as the sensors always get queried together
     forwardDistance = getForwardDistance();
     leftDistance = getLeftDistance();
 }
 
+float pulse(int proxTrig, int proxEcho)
 // might be renamed as it returns the distance in cm
 // TODO: also might be optimised as the sensors always get queried together
-float pulse(int proxTrig, int proxEcho)
 {
     digitalWrite(proxTrig, HIGH);
     delayMicroseconds(10);
@@ -142,11 +138,13 @@ float pulse(int proxTrig, int proxEcho)
 }
 
 float getForwardDistance()
+// returns forward distance in cm
 {
     return round(pulse(fProxTrig, fProxEcho) * 100.0) / 100.0;
 }
 
 float getLeftDistance()
+// returns left distance in cm
 {
     return round(pulse(lProxTrig, lProxEcho) * 100.0) / 100.0;
 }
