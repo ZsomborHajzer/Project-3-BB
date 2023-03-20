@@ -10,23 +10,23 @@
 // fProxEcho / fProxTrig - front proximity sensor echo / trigger
 // lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
 
-int RWF = 6;
-int RWB = 5;
+#define RWF 6
+#define RWB 5
 
-int LWF = 10;
-int LWB = 9;
+#define LWF 10
+#define LWB 9
 
-int encoderRW = 2;
-int encoderLW = 3;
+#define encoderRW 2
+#define encoderLW 3
 
-int fProxEcho = 11;
-int fProxTrig = 12;
+#define fProxEcho 11
+#define fProxTrig 12
 
-int lProxEcho = 7;
-int lProxTrig = 8;
+#define lProxEcho 7
+#define lProxTrig 8
 
-float forwardDistance = 0;
-float leftDistance = 0;
+float forwardDistance = .0f;
+float leftDistance = .0f;
 
 unsigned int countRW = 0;
 unsigned int countLW = 0;
