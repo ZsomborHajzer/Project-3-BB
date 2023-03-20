@@ -1,17 +1,29 @@
-#define RWF 6
-#define RWB 5
+// pins
+//
+// RWF - right wheel forward
+// RWB - right wheel backward
+//
+// LWF / LWB - left wheel
+//
+// encoderRW / encoderLW - right / left wheel encoder
+//
+// fProxEcho / fProxTrig - front proximity sensor echo / trigger
+// lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
 
-#define LWF 10
-#define LWB 9
+int RWF = 6;
+int RWB = 5;
 
-#define encoderRW 2
-#define encoderLW 3
+int LWF = 10;
+int LWB = 9;
 
-#define fProxEcho 11
-#define fProxTrig 12
+int encoderRW = 2;
+int encoderLW = 3;
 
-#define lProxEcho 7
-#define lProxTrig 8
+int fProxEcho = 11;
+int fProxTrig = 12;
+
+int lProxEcho = 7;
+int lProxTrig = 8;
 
 float forwardDistance = 0;
 float leftDistance = 0;
@@ -19,17 +31,20 @@ float leftDistance = 0;
 // might be used in future, WIP
 // bool goingForward = false;
 
-unsigned long countRW = 0;
-unsigned long countLW = 0;
+unsigned int countRW = 0;
+unsigned int countLW = 0;
 
 void setup()
 {
     Serial.begin(9600);
 
-    pinMode(RWF, OUTPUT);
-    pinMode(RWB, OUTPUT);
-    pinMode(LWF, OUTPUT);
-    pinMode(LWB, OUTPUT);
+    // can be left out as it does nothing
+
+    // pinMode(RWF, OUTPUT);
+    // pinMode(RWB, OUTPUT);
+
+    // pinMode(LWF, OUTPUT);
+    // pinMode(LWB, OUTPUT);
 
     pinMode(fProxEcho, INPUT);
     pinMode(fProxTrig, OUTPUT);
@@ -44,7 +59,17 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
 }
 
-//===================================|| MAZE GO STRAIGHT FUNCTION || =======================
+void loop()
+{
+    querySensors();
+    goForwardToWall();
+}
+
+//
+// movement functions
+
+// the function defines the behaviour of the car when it is going forward
+// it adjusts the car so that it is constantly 8.2 cm away from the wall
 void goForwardToWall()
 {
     if (leftDistance > 9.2)
@@ -65,9 +90,10 @@ void goForwardToWall()
     }
 }
 
-//===================================|| END OF MAZE GO STRAIGHT FUNCTION || =======================
+//
+// counter functions
 
-//===================================|| ENCODER FUNCTIONS || ======================================
+// used to update the counters of the encoders
 void updateRW()
 {
     noInterrupts();
@@ -82,6 +108,7 @@ void updateLW()
     interrupts();
 }
 
+// TODO: might be removed as it is not used
 void printEncoderMesurements()
 {
     Serial.println("Left wheel: " + String(countLW) + ", right wheel:" + String(countRW));
@@ -93,9 +120,7 @@ void resetCounters()
     countLW = 0;
 }
 
-//===================================|| END OF ENCODER FUNCTIONS|| ================================
-
-//===================================|| DISTANCE MEASUREMENT SENSORS|| ============================
+// sound sensors functions
 void querySensors()
 {
     // TODO: might be optimised as the sensors always get queried together
@@ -104,7 +129,7 @@ void querySensors()
 }
 
 // might be renamed as it returns the distance in cm
-// also might be optimised as the sensors always get queried together
+// TODO: also might be optimised as the sensors always get queried together
 float pulse(int proxTrig, int proxEcho)
 {
     digitalWrite(proxTrig, HIGH);
@@ -124,11 +149,4 @@ float getForwardDistance()
 float getLeftDistance()
 {
     return round(pulse(lProxTrig, lProxEcho) * 100.0) / 100.0;
-}
-//===================================|| END OF DISTANCE MEASUREMENTS || ===========================
-
-void loop()
-{
-    querySensors();
-    goForwardToWall();
 }
