@@ -1,14 +1,16 @@
-// pins
-//
-// RWF - right wheel forward
-// RWB - right wheel backward
-//
-// LWF / LWB - left wheel
-//
-// encoderRW / encoderLW - right / left wheel encoder
-//
-// fProxEcho / fProxTrig - front proximity sensor echo / trigger
-// lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
+/*
+    pins definition
+
+    RWF - right wheel forward
+    RWB - right wheel backward
+
+    LWF / LWB - left wheel
+
+    encoderRW / encoderLW - right / left wheel encoder
+
+    fProxEcho / fProxTrig - front proximity sensor echo / trigger
+    lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
+*/
 
 #define RWF 6
 #define RWB 5
@@ -59,6 +61,14 @@ void setup()
 void loop()
 {
     querySensors();
+
+    if (leftDistance > 25)
+    {
+        stop();
+        wait(150);
+        return performLeftTurn();
+    }
+
     goForward();
 }
 
@@ -84,6 +94,62 @@ void goForward()
         analogWrite(RWF, 255);
         analogWrite(LWF, 232);
     }
+}
+
+void goInTicks(int ticks)
+// moves the car forward for a given number of ticks
+{
+    resetCounters();
+
+    while (countRW < ticks)
+    {
+        analogWrite(RWF, 255);
+        analogWrite(LWF, 232);
+
+        // Serial.println(String(countRW) + "/" + String(ticks));
+        Serial.println("");
+    }
+
+    stop();
+}
+
+void performLeftTurn()
+{
+    goInTicks(17);
+    wait(300);
+
+    basicTurnLeft();
+    wait(300);
+
+    goInTicks(25);
+}
+
+void stop()
+{
+    analogWrite(RWF, 0);
+    analogWrite(RWB, 0);
+    analogWrite(LWF, 0);
+    analogWrite(LWB, 0);
+}
+
+// basic movement functions
+// they are simple functions to turn precisely
+
+void basicTurnLeft()
+{
+    stop();
+
+    resetCounters();
+    while (countLW < 14)
+    {
+        analogWrite(RWF, 255);
+        analogWrite(LWB, 254);
+
+        // Serial.println(String(countLW) + "/" + String(14));
+        Serial.println("");
+    }
+
+    stop();
 }
 
 // counter functions
@@ -147,4 +213,16 @@ float getLeftDistance()
 // returns left distance in cm
 {
     return round(pulse(lProxTrig, lProxEcho) * 100.0) / 100.0;
+}
+
+// other functions
+
+void wait(int timeToWait)
+// waits for an amount of time in milliseconds
+// used to eliminate the need to use the delay() function
+{
+    long time = millis();
+
+    while (millis() < time + timeToWait)
+        ;
 }
