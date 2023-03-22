@@ -78,12 +78,12 @@ void goForward()
 // the function defines the behaviour of the car when it is going forward
 // it adjusts the car so that it is constantly 8.2 cm away from the wall
 {
-    if (leftDistance > 6.2)
+    if (leftDistance > 4)
     {
         analogWrite(RWF, 255);
-        analogWrite(LWF, 192);
+        analogWrite(LWF, 180);
     }
-    else if (leftDistance < 4.2)
+    else if (leftDistance < 3)
     {
         // TODO: should be reviewed as the left wheel is not using max speed
         analogWrite(RWF, 225);
@@ -115,13 +115,13 @@ void goInTicks(int ticks)
 
 void performLeftTurn()
 {
-    goInTicks(17);
+    goInTicks(15);
     wait(300);
 
     basicTurnLeft();
     wait(300);
 
-    goInTicks(25);
+    goInTicks(10);
 }
 
 void stop()
