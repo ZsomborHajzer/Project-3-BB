@@ -66,7 +66,7 @@ void loop()
         return performRightTurn();
     }
 
-    goForward();
+    return goForward();
 }
 
 // movement functions
@@ -131,7 +131,6 @@ void performLeftTurn()
     wait(300);
 
     basicTurnLeft();
-
     wait(150);
 
     querySensors();
@@ -148,7 +147,6 @@ void performLeftTurn()
 void performRightTurn()
 {
     stop();
-
     wait(150);
 
     if (leftDistance < 6 || turnedRight)
@@ -186,8 +184,8 @@ void adjustToWall()
     }
 
     stop();
-    resetCounters();
 
+    resetCounters();
     while (countRW < 12)
     {
         analogWrite(RWB, 235);
@@ -195,16 +193,16 @@ void adjustToWall()
     }
 
     stop();
-    resetCounters();
 
+    resetCounters();
     while (countRW < 12)
     {
         analogWrite(RWF, 255);
     }
 
     stop();
-    resetCounters();
 
+    resetCounters();
     while (countRW < 8)
     {
         analogWrite(RWF, 255);
@@ -212,6 +210,7 @@ void adjustToWall()
     }
 
     stop();
+
     resetCounters();
 }
 
@@ -223,6 +222,7 @@ void stop()
 {
     analogWrite(RWF, 0);
     analogWrite(RWB, 0);
+
     analogWrite(LWF, 0);
     analogWrite(LWB, 0);
 }
@@ -261,7 +261,7 @@ void basicTurnRight()
 void updateRW()
 {
     noInterrupts();
-    countRW = countRW + 1;
+    countRW++;
     interrupts();
 }
 
