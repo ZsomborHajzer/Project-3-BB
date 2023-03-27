@@ -9,6 +9,12 @@ const int sensorPin6 = A5; // Sensor pin 6
 const int sensorPin7 = A6; // Sensor pin 7
 const int sensorPin8 = A7; // Sensor pin 8
 
+// Define distance sensor pins
+#define Trig 7
+#define Echo 8
+
+#define distanceThreshold 15 // threshold distance in cm to detect an obstacle
+
 
 // Define the pins for the left and right motor drivers
 const int rightMotorPin1 = 6;
@@ -34,6 +40,10 @@ const int threshold = 700;
 void setup() {
   // Initialize the serial communication
   Serial.begin(9600);
+  
+  // Set distance sensor pins
+  pinMode(Trig, OUTPUT);
+  pinMode(Echo, INPUT);
 
   // Set the motor pins as output
   pinMode(leftMotorPin1, OUTPUT);
@@ -48,6 +58,27 @@ void setup() {
 }
 
 void loop() {
+
+  // Measure distance to nearby objects using the ultrasonic sensor
+  long duration, distance;
+  digitalWrite(Trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trig, LOW);
+  duration = pulseIn(Echo, HIGH);
+  distance = duration * 0.034 / 2;
+
+// Print distance sensor readings
+  Serial.print(distance);
+  Serial.print("cm");
+  Serial.println();
+
+  if(distance == 14 || distance == 15 || distance == 16){
+    avoidObstacle();
+    findLine();
+    }
+  
   // Read the sensor values
   int sensor1 = analogRead(sensorPin1);
   int sensor2 = analogRead(sensorPin2);
@@ -76,20 +107,78 @@ void loop() {
   Serial.print(sensor8);
   Serial.println();
 
-  if (sensor4 > threshold && sensor5 > threshold) {
-   goforward();
-  } else if (sensor1 > threshold || sensor2 > threshold || sensor3 > threshold) {
-    turnLeft();
-  }else if(sensor6 < threshold || sensor7 < threshold || sensor8 < threshold) {
-    
-     turnRight();
-  }else if (sensor1 < threshold && sensor2 < threshold && sensor3 < threshold && sensor4 < threshold && sensor5 < threshold && sensor6 < threshold && sensor7 < threshold && sensor8 < threshold) {
-    halt();
-  }else if (sensor1 > threshold && sensor2 > threshold && sensor3 > threshold && sensor4 > threshold && sensor5 > threshold && sensor6 > threshold && sensor7 > threshold && sensor8 > threshold) {
-    halt();
+  if(sensor1 > 950 && sensor2 > 950 && sensor3 > 950 && sensor4 > 950 && sensor5 > 950 && sensor6 > 950 && sensor7 > 950 && sensor8 > 950){
+  halt;
   }
+  else if(sensor4 > threshold && sensor5 > threshold ){
+    goforward();
+    }
+    else if(sensor1 > threshold && sensor2 > threshold){
+      turnLeft();
+      }
+      else if(sensor3 > threshold){
+        slowLeft();
+        }
+        else if(sensor7 > threshold && sensor8 > threshold){
+          turnRight();
+          }
+          else if(sensor6 > threshold){
+            slowRight();
+            }
 }
 
+
+
+
+void avoidObstacle() {
+  // Set the speed and duration of the turn
+  int turnDuration = 300;
+  int turn2Duration = 400;
+  int driveDuration = 800;
+  int drive2Duration = 600;
+
+  // Turn left for turnDuration milliseconds
+  int startTime = millis();
+  while (millis() - startTime < turnDuration) {
+    turnLeftObstacle(); // It turns left somehow
+  }
+
+  startTime = millis();
+  while (millis() - startTime < driveDuration) {
+    goforward();
+  } 
+  // Drive forward for a short time
+  
+  startTime = millis();
+  while (millis() - startTime < turn2Duration) {
+    turnRightObstacle();
+  }
+
+}
+
+void findLine(){
+
+  int linedetector = 0;
+  
+  while(linedetector == 0){
+
+  int sensor1 = analogRead(sensorPin1);
+  int sensor2 = analogRead(sensorPin2);
+  int sensor3 = analogRead(sensorPin3);
+  int sensor4 = analogRead(sensorPin4);
+  int sensor5 = analogRead(sensorPin5);
+  int sensor6 = analogRead(sensorPin6);
+  int sensor7 = analogRead(sensorPin7);
+  int sensor8 = analogRead(sensorPin8);
+  
+  goforward();
+  
+  if(sensor1 > 700 || sensor2 > 700 || sensor3 > 700 || sensor4 > 700 || sensor5 > 700 || sensor6 > 700 || sensor7 > 700 || sensor8 > 700){
+    linedetector = 1;
+    }
+  }
+  
+}
 
 
 // Function definition for moving forward
@@ -109,9 +198,57 @@ void goforward() {
 // Define function to turn left
 void turnLeft() {
   if(counter1 <= inter && counter2<= inter) {
+  analogWrite(leftMotorPin1, 50);
+  analogWrite(leftMotorPin2, 0);
+  analogWrite(rightMotorPin1, 250);
+  analogWrite(rightMotorPin2, 0);
+  }else {
+    halt();
+    counterReset();
+  }
+}
+
+void turnLeftObstacle() {
+  if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 0);
-  analogWrite(leftMotorPin2, 255);
+  analogWrite(leftMotorPin2, 250);
+  analogWrite(rightMotorPin1, 250);
+  analogWrite(rightMotorPin2, 0);
+  }else {
+    halt();
+    counterReset();
+  }
+}
+
+void turnRightObstacle() {
+  if(counter1 <= inter && counter2<= inter) {
+  analogWrite(leftMotorPin1, 250);
+  analogWrite(leftMotorPin2, 0);
+  analogWrite(rightMotorPin1, 0);
+  analogWrite(rightMotorPin2, 250);
+  }else {
+    halt();
+    counterReset();
+  }
+}
+
+void slowLeft() {
+  if(counter1 <= inter && counter2<= inter) {
+  analogWrite(leftMotorPin1, 200);
+  analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 255);
+  analogWrite(rightMotorPin2, 0);
+  }else {
+    halt();
+    counterReset();
+  }
+}
+
+void slowRight() {
+  if(counter1 <= inter && counter2<= inter) {
+  analogWrite(leftMotorPin1, 255);
+  analogWrite(leftMotorPin2, 0);
+  analogWrite(rightMotorPin1, 200);
   analogWrite(rightMotorPin2, 0);
   }else {
     halt();
@@ -122,10 +259,10 @@ void turnLeft() {
 // Define function to turn right
 void turnRight() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 255);
+  analogWrite(leftMotorPin1, 250);
   analogWrite(leftMotorPin2, 0);
-  analogWrite(rightMotorPin1, 0);
-  analogWrite(rightMotorPin2, 255);
+  analogWrite(rightMotorPin1, 50);
+  analogWrite(rightMotorPin2, 0);
 }else {
     halt();
     counterReset();
