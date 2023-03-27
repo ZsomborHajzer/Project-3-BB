@@ -198,7 +198,7 @@ void goforward() {
 // Define function to turn left
 void turnLeft() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 50);
+  analogWrite(leftMotorPin1, 0);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 250);
   analogWrite(rightMotorPin2, 0);
@@ -234,7 +234,7 @@ void turnRightObstacle() {
 
 void slowLeft() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 200);
+  analogWrite(leftMotorPin1, 140);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 255);
   analogWrite(rightMotorPin2, 0);
@@ -248,7 +248,7 @@ void slowRight() {
   if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 255);
   analogWrite(leftMotorPin2, 0);
-  analogWrite(rightMotorPin1, 200);
+  analogWrite(rightMotorPin1, 140);
   analogWrite(rightMotorPin2, 0);
   }else {
     halt();
@@ -261,7 +261,7 @@ void turnRight() {
   if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 250);
   analogWrite(leftMotorPin2, 0);
-  analogWrite(rightMotorPin1, 50);
+  analogWrite(rightMotorPin1, 0);
   analogWrite(rightMotorPin2, 0);
 }else {
     halt();
