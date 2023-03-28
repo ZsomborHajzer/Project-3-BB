@@ -1,4 +1,7 @@
 #include <Adafruit_NeoPixel.h>
+#include <Servo.h>
+
+
 
 //================ start of Neopixels pins====================
 #define PIN 13          // Set the pin for NeoPixel data input
@@ -31,6 +34,19 @@ const int rightMotorPin2 = 5;
 const int leftMotorPin1 = 10;
 const int leftMotorPin2 = 9;
 
+// Define the servo and gripper pins
+Servo gripper;
+int gripperPin = 12;
+int pinServo = 12;
+
+int s0;
+int s1;
+int s2;
+int s3;
+int s4;
+int s5;
+int s6;
+int s7;
 
 const byte interruptPin1 = 2;
 const byte interruptPin2 = 3;
@@ -47,7 +63,7 @@ const int motorSpeed = 255;
 const int threshold = 700;
 
 
-
+bool startLineFunctionExecuted = false;
 
 
 void setup() {
@@ -66,6 +82,7 @@ void setup() {
   pinMode(leftMotorPin2, OUTPUT);
   pinMode(rightMotorPin1, OUTPUT);
   pinMode(rightMotorPin2, OUTPUT);
+  pinMode(gripperPin, OUTPUT);
 
   pinMode(interruptPin1, INPUT_PULLUP);
   pinMode(interruptPin2, INPUT_PULLUP);
@@ -93,7 +110,15 @@ void loop() {
 
 
 //======== end of loop for neopixels=========================================
+   if(!startLineFunctionExecuted){
+   
+     startLine();
 
+    startLineFunctionExecuted = true;
+  }
+    
+
+   
 
   // Measure distance to nearby objects using the ultrasonic sensor
   long duration, distance;
@@ -329,4 +354,58 @@ void counterRight() {
 void counterReset() {
   counter1 = 0;
   counter2 = 0;
+}
+
+
+void startLine() {
+ moveForward();
+  delay(500);
+
+  closeGripper();
+  Leftturn ();
+   moveForward();
+  delay(500);
+}
+
+
+// Function definition for moving forward
+  
+ void moveForward() {
+
+  analogWrite(leftMotorPin1, 255);
+  analogWrite(leftMotorPin2, 0);
+  analogWrite(rightMotorPin1, 255);
+  analogWrite(rightMotorPin2, 0);
+  }
+
+    // Turn left
+  void Leftturn() {
+  analogWrite(leftMotorPin1, 255);
+  analogWrite(leftMotorPin2, 0);
+  analogWrite(rightMotorPin1, 0);
+  analogWrite(rightMotorPin2, 0);
+  delay(1000);
+  }
+
+ // forloop 8-10x
+void closeGripper()
+{
+  for (int i = 0; i < 10; i++)
+  {
+    digitalWrite(pinServo, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(pinServo, LOW);
+    delay(10);
+  }
+}
+
+void openGripper()
+{
+  for (int i = 0; i < 10; i++)
+  {
+    digitalWrite(pinServo, HIGH);
+    delayMicroseconds(1500);
+    digitalWrite(pinServo, LOW);
+    delay(10);
+  }
 }
