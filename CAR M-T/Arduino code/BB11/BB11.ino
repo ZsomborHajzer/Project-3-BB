@@ -1,3 +1,12 @@
+#include <Adafruit_NeoPixel.h>
+
+//================ start of Neopixels pins====================
+#define PIN 13          // Set the pin for NeoPixel data input
+#define NUM_PIXELS 4    // Set the number of pixels in your NeoPixel strip
+
+// Create an instance of the Adafruit_NeoPixel class
+Adafruit_NeoPixel pixels(NUM_PIXELS, PIN, NEO_GRB + NEO_KHZ800);
+//============ end of Neopixels pins=========================
 
 // Define the sensor pins
 const int sensorPin1 = A0; // Sensor pin 1
@@ -37,9 +46,16 @@ const int motorSpeed = 255;
 // Define the threshold for detecting the black line
 const int threshold = 700;
 
+
+
+
+
 void setup() {
   // Initialize the serial communication
   Serial.begin(9600);
+
+  // Initialize the Neopixel strip
+  pixels.begin();
   
   // Set distance sensor pins
   pinMode(Trig, OUTPUT);
@@ -58,6 +74,26 @@ void setup() {
 }
 
 void loop() {
+
+//========start of loop for neopixels=========================================
+    // Set the color of the first pixel to red
+  pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Red
+
+  // Set the color of the second pixel to green
+  pixels.setPixelColor(1, pixels.Color(0, 255, 0)); // Green
+
+  // Set the color of the third pixel to blue
+  pixels.setPixelColor(2, pixels.Color(0, 0, 255)); // Blue
+
+  // Set the color of the fourth pixel to pink
+  pixels.setPixelColor(3, pixels.Color(0, 0, 255)); // Pink
+
+  // Show the updated colors on the Neopixel strip
+  pixels.show();
+
+
+//======== end of loop for neopixels=========================================
+
 
   // Measure distance to nearby objects using the ultrasonic sensor
   long duration, distance;
