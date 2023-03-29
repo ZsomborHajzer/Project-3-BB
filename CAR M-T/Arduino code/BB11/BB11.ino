@@ -364,7 +364,7 @@ void startLine() {
   closeGripper();
   Leftturn ();
    moveForward();
-  delay(500);
+  delay(50);
 }
 
 
@@ -380,7 +380,8 @@ void startLine() {
 
     // Turn left
   void Leftturn() {
-  analogWrite(leftMotorPin1, 255);
+  analogWrite(leftMotorPin1, 250
+  );
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
   analogWrite(rightMotorPin2, 0);
