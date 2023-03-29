@@ -18,6 +18,7 @@ int s4;
 int s5;
 int s6;
 int s7;
+
 int s0m;
 int s1m;
 int s2m;
@@ -179,7 +180,7 @@ void makeIRReadings()
   directionCalc = s0m + s1m + s2m + s3m + s4m + s5m + s6m + s7m;
 }
 
-void printIRReadings()
+void printIRReadings() // For testing
 {
 
   Serial.print(s0);
@@ -251,7 +252,7 @@ void turnAround()
   }
   resetCounters();
 
-  while (countLW <= 19)
+  while (countLW <= 15)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -261,7 +262,7 @@ void turnAround()
   }
   resetCounters();
 
-  while (countLW <= 20)
+  while (countLW <= 23)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -283,7 +284,7 @@ void rightAngleRight()
   carStop();
   wait(200);
 
-  while (countLW < 2)
+  while (countLW < 3)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
@@ -295,7 +296,7 @@ void rightAngleRight()
   carStop();
   wait(200);
 
-  while (countLW < 34)
+  while (countLW < 35)
   {
     printEncoderMesurements();
     analogWrite(RWF, 0);
@@ -326,7 +327,7 @@ void rightAngleLeft()
     analogWrite(LWB, 0);
   }
   resetCounters();
-  while (countRW < 33)
+  while (countRW < 35)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
@@ -494,12 +495,12 @@ void startProgramFun()
   wait(1000);
   resetCounters();
 
-  while (countLW < 49)
+  while (countLW < 39)
   {
     printEncoderMesurements();
-    analogWrite(RWF, 242);
+    analogWrite(RWF, 222);
     analogWrite(RWB, 0);
-    analogWrite(LWF, 255);
+    analogWrite(LWF, 234 );
     analogWrite(LWB, 0);
   }
   resetCounters();
@@ -611,21 +612,21 @@ void followLine()
       {
         forwards();
       }
-      else if (directionCalc > -6 && directionCalc <= -2)
+      else if (directionCalc >= -6 && directionCalc <= -2)
       {
         slowLeft();
       }
-      else if (directionCalc < 6 && directionCalc >= 2)
+      else if (directionCalc <= 6 && directionCalc >= 2)
       {
         slowRight();
       }
-      else if (directionCalc <= -6)
+      else if (directionCalc < -6)
       {
-        sharpLeft();
+        slowLeft();
       }
-      else if (directionCalc >= 6)
+      else if (directionCalc > 6)
       {
-        sharpRight();
+       slowRight();
       }
     }
     else if (intersectionDecision == false && endCheck == true)
@@ -683,6 +684,5 @@ void loop()
 {
   makeIRReadings();
   printIRReadings();
-  // printEncoderMesurements();
   followLine();
 }
