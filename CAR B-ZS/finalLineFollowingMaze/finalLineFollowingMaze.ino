@@ -41,7 +41,13 @@ int finishDanceSequenceCounter = 0;
 int blackBlockCounter = 0;
 boolean startProgram = true;
 
-//===============================================================================
+//========================|| Distance Sensor pins/variables || =================
+
+int trigPin = 8;    // Trigger
+int echoPin = 4;    // Echo
+volatile long duration, cm;
+
+//==============================================================================
 
 //===================||WHEEL SENSOR PINS AND VARIABLES||====================
 
@@ -62,6 +68,9 @@ void setup()
 {
   // Initialize hardware
   Serial.begin(9600);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   pinMode(pinServo, OUTPUT);
   pinMode(encoderRW, INPUT);
   pinMode(encoderLW, INPUT);
@@ -469,8 +478,7 @@ void turnOnRightWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual()
   analogWrite(LWF, 0);
   analogWrite(LWB, 0);
 
-  while (millis() < time + 5)
-    ;
+  while (millis() < time + 5);
 }
 
 void turnOnLeftWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual()
@@ -482,8 +490,7 @@ void turnOnLeftWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual()
   analogWrite(LWF, 150);
   analogWrite(LWB, 0);
 
-  while (millis() < time + 6)
-    ;
+  while (millis() < time + 6);
 }
 
 //=====================||END OF INTERSECTION DECISION MAKING FUNCTIONS||=====================
@@ -531,7 +538,6 @@ void endProgramFun()
 
     for (int i = 0; i < 5; i++)
     {
-
       resetCounters();
 
       while (countRW <= 45)
@@ -574,7 +580,6 @@ void endProgramFun()
         }
       }
     }
-
     intersectionDecision = false;
     endCheck = false;
     loop();
@@ -587,7 +592,6 @@ void followLine()
 {
   if (startProgram == false)
   {
-
     if (intersectionDecision == true && endCheck == true)
     {
       if ((s0 == 1) && (s7 == 1))
@@ -667,22 +671,40 @@ void followLine()
       carStop();
     }
   }
-  else
-  {
-    startProgramFun();
-  }
 }
 
 //=====================||END OF LINE FOLLOWING FUNCTIONS||====================================                          END OF LINE FOLLOWING FUNCTIONS
 
-//=====================||PATTERN RECOGNITION FUNCTIONS||======================================
-// MAYBE PATTERN RECOGNITION SHOULD BE DONE IN THE LOOP AND NOT IN ITS OWN FUNCTIONS
-// ON THE OTHER HAND I STILL NEED TO FIGURE OUT HOW TO TELL THE CAR TO CHECK ---> STORE DATA ---> MOVE FORWARD ---> CHECK AGAIN ---> COMPARE ---> DECIDE
-//=====================||END OF PATTERN RECOGNITION FUNCTIONS||===============================
+//=====================||Distance Sensing||======================================
+
+void distanceSensing()
+{
+  if(startProgram == true)
+  {
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(5);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    pinMode(echoPin, INPUT);
+    duration = pulseIn(echoPin, HIGH);
+    cm = (duration/2) / 29.1; 
+    Serial.print(cm);
+    Serial.print("cm");
+    Serial.println();  
+   
+    if(cm < 24){
+      startProgramFun();
+    }
+  }
+}
+
+//=====================||END OF Distance Sensing FUNCTIONS||===============================
 
 void loop()
 {
+  distanceSensing();
   makeIRReadings();
-  printIRReadings();
   followLine();
+ 
 }
