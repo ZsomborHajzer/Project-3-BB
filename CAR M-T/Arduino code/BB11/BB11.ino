@@ -27,7 +27,7 @@ const int sensorPin8 = A7; // Sensor pin 8
 
 #define distanceThreshold 15 // threshold distance in cm to detect an obstacle
 
-
+int endLineCounter = 0;
 // Define the pins for the left and right motor drivers
 const int rightMotorPin1 = 6;
 const int rightMotorPin2 = 5;
@@ -116,9 +116,10 @@ void loop() {
 
     startLineFunctionExecuted = true;
   }
-    
 
-   
+ if(endLineCounter > 1){
+  halt(); 
+ }
 
   // Measure distance to nearby objects using the ultrasonic sensor
   long duration, distance;
@@ -170,7 +171,7 @@ void loop() {
 
   if(sensor1 > 900 && sensor2 > 900 && sensor3 > 900 && sensor4 > 900 && sensor5 > 900 && sensor6 > 900 && sensor7 > 900 && sensor8 > 900){
    goforward();
-    delay(200);
+   delay(100);
     // Read the sensor values again
   int sensor1 = analogRead(sensorPin1);
   int sensor2 = analogRead(sensorPin2);
@@ -188,6 +189,7 @@ void loop() {
   delay(500); // Wait for the gripper to open
    moveBack();
   delay(500);
+  endLineCounter++;
   }
   
   
@@ -314,7 +316,7 @@ void turnRightObstacle() {
 
 void slowLeft() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 140);
+  analogWrite(leftMotorPin1, 155);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 255);
   analogWrite(rightMotorPin2, 0);
@@ -328,7 +330,7 @@ void slowRight() {
   if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 255);
   analogWrite(leftMotorPin2, 0);
-  analogWrite(rightMotorPin1, 140);
+  analogWrite(rightMotorPin1, 155);
   analogWrite(rightMotorPin2, 0);
   }else {
     halt();
@@ -353,9 +355,6 @@ void turnRight() {
 
   
 }
-
-
-
 
 
 // Define function to halt
@@ -454,6 +453,7 @@ void endLine() {
   closeGripper();
   halt();
   delay(50);
+  endLineCounter++;
 }
 
 
