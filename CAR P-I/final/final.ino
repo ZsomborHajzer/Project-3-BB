@@ -47,6 +47,7 @@ float forwardDistance = .0f;
 float leftDistance = .0f;
 
 boolean waitingStart = true;
+boolean startSequence = false;
 
 boolean turnedRight = false;
 
@@ -92,6 +93,29 @@ void loop()
         }
 
         return wait(100);
+    }
+
+    // the start itself
+    // the robot ought to move, pick up the stick,
+    // turn left, and move forward
+    if (startSequence)
+    {
+        wait(4000);
+
+        goForwardInTicks(55);
+        wait(250);
+
+        gripClose();
+        wait(250);
+
+        basicTurnLeft();
+        wait(250);
+
+        goForwardInTicks(50);
+
+        startSequence = false;
+
+        return wait(250);
     }
 
     // the main sequence
