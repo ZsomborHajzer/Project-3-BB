@@ -108,7 +108,6 @@ void makeIRReadings()
     s0 = 0;
     s0m = 0;
   }
-
   if (s1 > sensorTreshMark)
   {
     s1 = 1;
@@ -322,7 +321,6 @@ void rightAngleRight()
 
 void rightAngleLeft()
 {
-
   carStop();
   wait(200);
   resetCounters();
@@ -336,7 +334,7 @@ void rightAngleLeft()
     analogWrite(LWB, 0);
   }
   resetCounters();
-  while (countRW < 35)
+  while (countRW < 34)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
@@ -401,24 +399,6 @@ void slowLeft()
   analogWrite(LWB, 0);
 }
 
-void sharpRight()
-{
-  turnOnRightWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual();
-  analogWrite(RWF, 150);
-  analogWrite(RWB, 0);
-  analogWrite(LWF, 242);
-  analogWrite(LWB, 0);
-}
-
-void sharpLeft()
-{
-  turnOnLeftWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual();
-  analogWrite(RWF, 255);
-  analogWrite(RWB, 0);
-  analogWrite(LWF, 158);
-  analogWrite(LWB, 0);
-}
-
 //=====================||END OF LINE FOLLOWING DIRECTION FUNCTIONS||==========================                          END OF LINE FOLLOWING DIRECTION FUNCTIONS
 
 //=====================||Gripper Functions||==========================
@@ -448,53 +428,18 @@ void closeGripper()
 
 //=====================||END OF Gripper Functions||==========================
 
-//=====================||INTERSECTION DECISION MAKING FUNCTIONS||============================
+//=====================|| Wait FUNCTIONS||============================
 
 void wait(int timeToWait)
 {
   time = millis();
   carStop();
-  while (millis() < time + timeToWait)
-    ;
+  while (millis() < time + timeToWait);
 }
+//=====================||END OF WAIT FUNCTIONS||=====================
 
-int waitAndGo()
-{
-  time = millis();
-  analogWrite(RWF, 255);
-  analogWrite(RWB, 0);
-  analogWrite(LWF, 255);
-  analogWrite(LWB, 0);
-  while (millis() < time + 60)
-    ;
-}
 
-void turnOnRightWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual()
-{
-  time = millis();
-
-  analogWrite(RWF, 150);
-  analogWrite(RWB, 0);
-  analogWrite(LWF, 0);
-  analogWrite(LWB, 0);
-
-  while (millis() < time + 5);
-}
-
-void turnOnLeftWheelForALittleMilliSecondSoThatItHelpsWithMakingMotorsEqual()
-{
-  time = millis();
-
-  analogWrite(RWF, 0);
-  analogWrite(RWB, 0);
-  analogWrite(LWF, 150);
-  analogWrite(LWB, 0);
-
-  while (millis() < time + 6);
-}
-
-//=====================||END OF INTERSECTION DECISION MAKING FUNCTIONS||=====================
-
+// ====================|| START / END SEQUENCE || ===================
 void startProgramFun()
 {
   carStop();
@@ -586,6 +531,8 @@ void endProgramFun()
   }
 }
 
+// ====================|| END OF START / END SEQUENCE || ===================
+
 //=====================||LINE FOLLOWING FUNCTIONS||===========================================
 
 void followLine()
@@ -649,7 +596,7 @@ void followLine()
     }
     else if (intersectionDecision == true && endCheck == false)
     {
-      if (s0 == 1 && s1 == 1 && s2 == 1 && s3 == 1 && s4 == 1 && s5 == 1 && s6 == 1 && s7 == 1)
+      if (s1 == 1 && s2 == 1 && s3 == 1 && s4 == 1 && s5 == 1 && s6 == 1)
       {
 
         endProgramFun();
@@ -672,7 +619,6 @@ void followLine()
     }
   }
 }
-
 //=====================||END OF LINE FOLLOWING FUNCTIONS||====================================                          END OF LINE FOLLOWING FUNCTIONS
 
 //=====================||Distance Sensing||======================================
@@ -692,13 +638,11 @@ void distanceSensing()
     Serial.print(cm);
     Serial.print("cm");
     Serial.println();  
-   
     if(cm < 24){
       startProgramFun();
     }
   }
 }
-
 //=====================||END OF Distance Sensing FUNCTIONS||===============================
 
 void loop()
@@ -706,5 +650,4 @@ void loop()
   distanceSensing();
   makeIRReadings();
   followLine();
- 
 }
