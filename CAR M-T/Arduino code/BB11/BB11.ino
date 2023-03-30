@@ -121,7 +121,7 @@ void loop() {
   halt(); 
  }
 
-  // Measure distance to nearby objects using the ultrasonic sensor
+  // Measure distance to nearby objects us bing the ultrasonic sensor
   long duration, distance;
   digitalWrite(Trig, LOW);
   delayMicroseconds(2);
@@ -136,7 +136,7 @@ void loop() {
   Serial.print("cm");
   Serial.println();
 
-  if(distance == 14 || distance == 15 || distance == 16){
+  if(distance < 13 ){
     avoidObstacle();
     findLine();
     }
@@ -188,7 +188,7 @@ void loop() {
   openGripper();
   delay(500); // Wait for the gripper to open
    moveBack();
-  delay(500);
+  delay(1000);
   endLineCounter++;
   }
   
@@ -215,10 +215,10 @@ void loop() {
 
 void avoidObstacle() {
   // Set the speed and duration of the turn
-  int turnDuration = 300;
-  int turn2Duration = 400;
-  int driveDuration = 800;
-  int drive2Duration = 600;
+  int turnDuration = 330;
+  int turn2Duration = 448;
+  int driveDuration = 600;
+  int drive2Duration = 500;
 
   // Turn left for turnDuration milliseconds
   int startTime = millis();
@@ -344,7 +344,8 @@ void slowRight() {
 // Define function to turn right
 void turnRight() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 200);
+  analogWrite(leftMotorPin1, 200
+  );
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
   analogWrite(rightMotorPin2, 0);
