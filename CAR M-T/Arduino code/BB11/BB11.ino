@@ -194,21 +194,22 @@ void loop() {
   
   
   }
-  else if(sensor4 > threshold || sensor5 > threshold ){
-    goforward();
-    }
+  
     else if(sensor1 > threshold || sensor2 > threshold || sensor3 > threshold){
       turnLeft();
       }
       else if(sensor3 > threshold){
-        slowLeft();
+        turnLeft();
         }
         else if(sensor7 > threshold || sensor8 > threshold){
           turnRight();
           }
           else if(sensor6 > threshold){
-            slowRight();
+            turnRight();
             }
+    else if(sensor4 > threshold || sensor5 > threshold ){
+    goforward();
+    }
 }
 
 
@@ -282,7 +283,7 @@ void turnLeft() {
   if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 0);
   analogWrite(leftMotorPin2, 0);
-  analogWrite(rightMotorPin1, 255);
+  analogWrite(rightMotorPin1, 200);
   analogWrite(rightMotorPin2, 0);
   }else {
     halt();
@@ -343,7 +344,7 @@ void slowRight() {
 // Define function to turn right
 void turnRight() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 255);
+  analogWrite(leftMotorPin1, 200);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
   analogWrite(rightMotorPin2, 0);
