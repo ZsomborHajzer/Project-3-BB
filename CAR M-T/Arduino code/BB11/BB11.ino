@@ -60,11 +60,11 @@ int inter = 2;
 const int motorSpeed = 255;
 
 // Define the threshold for detecting the black line
-const int threshold = 700;
+const int threshold = 800;
 
 
 bool startLineFunctionExecuted = false;
-
+bool endLineFunctionExecuted = false;
 
 void setup() {
   // Initialize the serial communication
@@ -168,27 +168,46 @@ void loop() {
   Serial.print(sensor8);
   Serial.println();
 
+  if(sensor1 > 900 && sensor2 > 900 && sensor3 > 900 && sensor4 > 900 && sensor5 > 900 && sensor6 > 900 && sensor7 > 900 && sensor8 > 900){
+   goforward();
+    delay(200);
+    // Read the sensor values again
+  int sensor1 = analogRead(sensorPin1);
+  int sensor2 = analogRead(sensorPin2);
+  int sensor3 = analogRead(sensorPin3);
+  int sensor4 = analogRead(sensorPin4);
+  int sensor5 = analogRead(sensorPin5);
+  int sensor6 = analogRead(sensorPin6);
+  int sensor7 = analogRead(sensorPin7);
+  int sensor8 = analogRead(sensorPin8);
+
   if(sensor1 > 950 && sensor2 > 950 && sensor3 > 950 && sensor4 > 950 && sensor5 > 950 && sensor6 > 950 && sensor7 > 950 && sensor8 > 950){
-  halt;
+   halt();
+  
+  openGripper();
+  delay(500); // Wait for the gripper to open
+   moveBack();
+  delay(500);
   }
-  else if(sensor4 > threshold && sensor5 > threshold ){
+  
+  
+  }
+  else if(sensor4 > threshold || sensor5 > threshold ){
     goforward();
     }
-    else if(sensor1 > threshold && sensor2 > threshold){
+    else if(sensor1 > threshold || sensor2 > threshold || sensor3 > threshold){
       turnLeft();
       }
       else if(sensor3 > threshold){
         slowLeft();
         }
-        else if(sensor7 > threshold && sensor8 > threshold){
+        else if(sensor7 > threshold || sensor8 > threshold){
           turnRight();
           }
           else if(sensor6 > threshold){
             slowRight();
             }
 }
-
-
 
 
 void avoidObstacle() {
@@ -261,7 +280,7 @@ void turnLeft() {
   if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 0);
   analogWrite(leftMotorPin2, 0);
-  analogWrite(rightMotorPin1, 250);
+  analogWrite(rightMotorPin1, 255);
   analogWrite(rightMotorPin2, 0);
   }else {
     halt();
@@ -272,8 +291,8 @@ void turnLeft() {
 void turnLeftObstacle() {
   if(counter1 <= inter && counter2<= inter) {
   analogWrite(leftMotorPin1, 0);
-  analogWrite(leftMotorPin2, 250);
-  analogWrite(rightMotorPin1, 250);
+  analogWrite(leftMotorPin2, 255);
+  analogWrite(rightMotorPin1, 255);
   analogWrite(rightMotorPin2, 0);
   }else {
     halt();
@@ -283,10 +302,10 @@ void turnLeftObstacle() {
 
 void turnRightObstacle() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 250);
+  analogWrite(leftMotorPin1, 255);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
-  analogWrite(rightMotorPin2, 250);
+  analogWrite(rightMotorPin2, 255);
   }else {
     halt();
     counterReset();
@@ -315,12 +334,14 @@ void slowRight() {
     halt();
     counterReset();
   }
+
+
 }
 
 // Define function to turn right
 void turnRight() {
   if(counter1 <= inter && counter2<= inter) {
-  analogWrite(leftMotorPin1, 250);
+  analogWrite(leftMotorPin1, 255);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
   analogWrite(rightMotorPin2, 0);
@@ -328,7 +349,13 @@ void turnRight() {
     halt();
     counterReset();
   }
+
+
+  
 }
+
+
+
 
 
 // Define function to halt
@@ -378,10 +405,18 @@ void startLine() {
   analogWrite(rightMotorPin2, 0);
   }
 
+   void moveBack() {
+
+  analogWrite(leftMotorPin1, 0);
+  analogWrite(leftMotorPin2, 255);
+  analogWrite(rightMotorPin1, 0);
+  analogWrite(rightMotorPin2, 255);
+  
+  }
+
     // Turn left
   void Leftturn() {
-  analogWrite(leftMotorPin1, 250
-  );
+  analogWrite(leftMotorPin1, 150);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
   analogWrite(rightMotorPin2, 0);
@@ -410,3 +445,21 @@ void openGripper()
     delay(10);
   }
 }
+
+void endLine() {
+ openGripper();
+  delay(500);
+  moveBack();
+  delay(500);
+  closeGripper();
+  halt();
+  delay(50);
+}
+
+
+ // if(!endLineFunctionExecuted){
+   
+  //   endLine();
+
+ //   endLineFunctionExecuted = true;
+ // }
