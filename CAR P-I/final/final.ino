@@ -12,6 +12,9 @@
     lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
 
     servo - servo pin
+
+    ir1-ir6 - IR sensors starting from the left side
+              the most left and the most right ones are not used
 */
 
 #define RWF 6
@@ -30,6 +33,16 @@
 #define lProxTrig 8
 
 #define servo 4
+
+#define ir1 A5
+#define ir2 A4
+#define ir3 A3
+#define ir4 A2
+#define ir5 A1
+#define ir6 A0
+
+int irSensors[6] = {ir1, ir2, ir3, ir4, ir5, ir6};
+boolean irValues[6];
 
 float forwardDistance = .0f;
 float leftDistance = .0f;
@@ -159,11 +172,11 @@ void performRightTurn()
     if (leftDistance < 6 || turnedRight)
     {
         basicTurnRight();
-        turnedRight = true;
     }
     else
     {
         adjustToWall();
+        turnedRight = true;
     }
 
     wait(150);
@@ -317,6 +330,33 @@ float getLeftDistance()
 // returns left distance in cm
 {
     return round(pulse(lProxTrig, lProxEcho) * 100.0) / 100.0;
+}
+
+// IR sensors functions
+
+void queryIRSensors()
+// the function sets irValues[] to the actual values
+{
+    for (int i = 0; i < 6; i++)
+    {
+        irValues[i] = analogRead(irSensors[i]) > 800;
+    }
+}
+
+boolean allBlack()
+{
+    short sum = 0;
+
+    queryIRSensors();
+    for (int i = 0; i < 6; i++)
+    {
+        if (irValues[i])
+        {
+            sum++;
+        };
+    }
+
+    return sum == 6;
 }
 
 // other functions
