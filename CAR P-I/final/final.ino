@@ -10,6 +10,8 @@
 
     fProxEcho / fProxTrig - front proximity sensor echo / trigger
     lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
+
+    servo - servo pin
 */
 
 #define RWF 6
@@ -26,6 +28,8 @@
 
 #define lProxEcho 7
 #define lProxTrig 8
+
+#define servo 4
 
 float forwardDistance = .0f;
 float leftDistance = .0f;
@@ -50,6 +54,8 @@ void setup()
 
     attachInterrupt(digitalPinToInterrupt(encoderRW), updateRW, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
+
+    gripOpen();
 }
 
 void loop()
@@ -108,6 +114,7 @@ void goForwardInTicks(int ticks)
     turnedRight = false;
 
     stop();
+    gripClose();
 }
 
 void goBackwardInTicks(int ticks)
@@ -232,7 +239,7 @@ void basicTurnLeft()
     stop();
 
     resetCounters();
-    while (countRW < 16)
+    while (countRW < 17)
     {
         analogWrite(RWF, 255);
         analogWrite(LWB, 255);
@@ -313,6 +320,28 @@ float getLeftDistance()
 }
 
 // other functions
+
+void gripOpen()
+{
+    // for (int i = 0; i < 10; i++)
+    // {
+    digitalWrite(servo, HIGH);
+    delayMicroseconds(2000);
+    digitalWrite(servo, LOW);
+    delay(10);
+    // }
+}
+
+void gripClose()
+{
+    // for (int i = 0; i < 10; i++)
+    // {
+    digitalWrite(servo, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(servo, LOW);
+    delay(10);
+    // }
+}
 
 void wait(int timeToWait)
 // waits for an amount of time in milliseconds
