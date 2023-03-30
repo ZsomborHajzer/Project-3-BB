@@ -14,7 +14,6 @@
     servo - servo pin
 
     ir1-ir6 - IR sensors starting from the left side
-              the most left and the most right ones are not used
 */
 
 #define RWF 6
@@ -47,6 +46,8 @@ boolean irValues[6];
 float forwardDistance = .0f;
 float leftDistance = .0f;
 
+boolean waitingStart = true;
+
 boolean turnedRight = false;
 
 volatile int countRW = 0;
@@ -68,11 +69,33 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(encoderRW), updateRW, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
 
+    // this initialises the gripper
+    for (int i = 0; i < 4; i++)
+    {
+        gripOpen();
+    }
+
     gripOpen();
 }
 
 void loop()
 {
+    // the code for awaiting the start
+    // if the robot sees an object in front of it, it starts
+    if (waitingStart)
+    {
+        querySensors();
+        if (forwardDistance < 25)
+        {
+            waitingStart = false;
+            startSequence = true;
+        }
+
+        return wait(100);
+    }
+
+    // the main sequence
+
     querySensors();
 
     if (leftDistance > 25)
@@ -186,6 +209,7 @@ void performRightTurn()
     {
         wait(100);
         goForwardInTicks(25);
+        turnedRight = true;
     }
 
     return wait(150);
