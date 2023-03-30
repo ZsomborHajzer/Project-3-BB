@@ -48,6 +48,7 @@ float leftDistance = .0f;
 
 boolean waitingStart = true;
 boolean startSequence = false;
+boolean endDetected = false;
 
 boolean turnedRight = false;
 
@@ -118,6 +119,19 @@ void loop()
         return wait(250);
     }
 
+    endDetected = allBlack();
+
+    if (endDetected)
+    {
+        gripOpen();
+        delay(150);
+        goBackwardInTicks(20);
+        delay(150);
+        gripClose();
+        while (true)
+            ;
+    }
+
     // the main sequence
 
     querySensors();
@@ -158,6 +172,9 @@ void goForward()
     }
 
     turnedRight = false;
+
+    endDetected = allBlack();
+    // gripClose();
 }
 
 void goForwardInTicks(int ticks)
@@ -172,6 +189,8 @@ void goForwardInTicks(int ticks)
     }
 
     turnedRight = false;
+
+    endDetected = allBlack();
 
     stop();
     gripClose();
