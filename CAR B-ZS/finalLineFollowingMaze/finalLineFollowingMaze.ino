@@ -334,7 +334,7 @@ void rightAngleLeft()
     analogWrite(LWB, 0);
   }
   resetCounters();
-  while (countRW < 34)
+  while (countRW < 33)
   {
     printEncoderMesurements();
     analogWrite(RWF, 255);
