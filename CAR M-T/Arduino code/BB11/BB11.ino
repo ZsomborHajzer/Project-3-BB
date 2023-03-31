@@ -225,8 +225,8 @@ void loop() {
 
 void avoidObstacle() {
   // Set the speed and duration of the turn
-  int turnDuration = 330;
-  int turn2Duration = 448;
+  int turnDuration = 300;
+  int turn2Duration = 450;
   int driveDuration = 600;
   int drive2Duration = 500;
 
