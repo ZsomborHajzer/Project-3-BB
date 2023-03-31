@@ -1,4 +1,3 @@
-
 //INCLUDED LIBRARIES
 
 #include <Adafruit_NeoPixel.h>
@@ -45,7 +44,7 @@ Servo gripper;
 int gripperPin = 12;
 int pinServo = 12;
 
-//Set the int needed
+// Set the int needed
 int s0;
 int s1;
 int s2;
@@ -70,14 +69,14 @@ const int motorSpeed = 255;
 // Define the threshold for detecting the black line
 const int threshold = 800;
 
-//some functions declaration
+// Some functions declaration
 bool startLineFunctionExecuted = false;
 bool endLineFunctionExecuted = false;
 
 
 unsigned long time, lasttime;
 
-//================ START OF SETUP  =========================================================
+//================ START OF SETUP  ====================
 void setup() {
   // Initialize the serial communication
   Serial.begin(9600);
@@ -102,13 +101,13 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(interruptPin2), counterRight, CHANGE);
 }
 
-//================ END OF SETUP  ==========================================================
+//================ END OF SETUP  ===============================================
 
-//================ START OF LOOP  =========================================================
+//================ START OF LOOP  ===============================================
 void loop() {
 
   
-  //========start of loop for neopixels=====================================================
+  //========start of loop for neopixels=========================================
   // Set the color of the first pixel to red
   pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Red
 
@@ -124,7 +123,7 @@ void loop() {
   // Show the updated colors on the Neopixel strip
   pixels.show();
 
-  //======== end of loop for neopixels=========================================================
+  //======== end of loop for neopixels=========================================
   
   if (!startLineFunctionExecuted) {
 
@@ -182,7 +181,7 @@ void loop() {
   Serial.println();
 
   if (sensor1 > 900 && sensor2 > 900 && sensor3 > 900 && sensor4 > 900 && sensor5 > 900 && sensor6 > 900 && sensor7 > 900 && sensor8 > 900) {
-    goForward();
+    goforward();
     delay(100);
     // Read the sensor values again
     int sensor1 = analogRead(sensorPin1);
@@ -218,7 +217,7 @@ void loop() {
     turnRight();
   }
   else if (sensor4 > threshold || sensor5 > threshold ) {
-    goForward();
+    goforward();
   }
 }
 
@@ -238,23 +237,23 @@ void avoidObstacle() {
 
   startTime = millis();
   while (millis() - startTime < driveDuration) {
-    goForward();
+    goforward();
   }
   // Drive forward for a short time
 
   startTime = millis();
   while (millis() - startTime < turn2Duration) {
     turnRightObstacle();
- //Turn right for short amount of time
+ // Turn right for short amount of time
   }
 }
 
 // function needed to find line
 void findLine() {
 
-  int lineDetector = 0;
+  int linedetector = 0;
 
-  while (lineDetector == 0) {
+  while (linedetector == 0) {
 
     int sensor1 = analogRead(sensorPin1);
     int sensor2 = analogRead(sensorPin2);
@@ -265,21 +264,21 @@ void findLine() {
     int sensor7 = analogRead(sensorPin7);
     int sensor8 = analogRead(sensorPin8);
 
-    goForward();
+    goforward();
 
     // go forward until it detects line
 
     if (sensor1 > 700 || sensor2 > 700 || sensor3 > 700 || sensor4 > 700 || sensor5 > 700 || sensor6 > 700 || sensor7 > 700 || sensor8 > 700) {
-      lineDetector = 1;
+      linedetector = 1;
     }
   }
 }
 
-//================ END OF LOOP  ====================================================================================================================================================
+//================ END OF LOOP  ===============================================================
 
-//================ START FUNCTION DECLARATIONS  ====================================================================================================================================
+//================ START FUNCTION DECLARATIONS  ===============================================
 // Function definition for moving forward
-void goForward() {
+void goforward() {
   if (counter1 <= inter && counter2 <= inter) {
     // Move both motors forward
     analogWrite(leftMotorPin1, 255);
@@ -404,7 +403,7 @@ void startLine() {
   delay(500);
 
   closeGripper();
-  LeftTurn ();
+  Leftturn ();
   moveForward();
   delay(50);
 }
@@ -427,7 +426,7 @@ void moveBack() {
 }
 
 //Function definition to Turn left
-void LeftTurn() {
+void Leftturn() {
   analogWrite(leftMotorPin1, 150);
   analogWrite(leftMotorPin2, 0);
   analogWrite(rightMotorPin1, 0);
@@ -490,4 +489,4 @@ void distanceMeasure()
 
 
 
-//================ END FUNCTION DECLARATIONS  ====================================================================================================================================
+//================ END FUNCTION DECLARATIONS  ===============================================
