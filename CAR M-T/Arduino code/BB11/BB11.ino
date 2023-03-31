@@ -245,9 +245,11 @@ void avoidObstacle() {
   startTime = millis();
   while (millis() - startTime < turn2Duration) {
     turnRightObstacle();
+ //Turn right for short amount of time
   }
 }
 
+// function needed to find line
 void findLine() {
 
   int linedetector = 0;
@@ -264,6 +266,8 @@ void findLine() {
     int sensor8 = analogRead(sensorPin8);
 
     goforward();
+
+    // go forward until it detects line
 
     if (sensor1 > 700 || sensor2 > 700 || sensor3 > 700 || sensor4 > 700 || sensor5 > 700 || sensor6 > 700 || sensor7 > 700 || sensor8 > 700) {
       linedetector = 1;
@@ -468,7 +472,7 @@ void endLine() {
   endLineCounter++;
 }
 
-
+// Function needed to read ultra-sonic sensor values
 void distanceMeasure()
 {
   
