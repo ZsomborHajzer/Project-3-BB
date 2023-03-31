@@ -24,6 +24,8 @@ const int sensorPin6 = A5; // Sensor pin 6
 const int sensorPin7 = A6; // Sensor pin 7
 const int sensorPin8 = A7; // Sensor pin 8
 
+unsigned long duration, distance = 30;
+
 // Define distance sensor pins
 #define Trig 7
 #define Echo 8
@@ -72,6 +74,9 @@ const int threshold = 800;
 bool startLineFunctionExecuted = false;
 bool endLineFunctionExecuted = false;
 
+
+unsigned long time, lasttime;
+
 //================ START OF SETUP  ====================
 void setup() {
   // Initialize the serial communication
@@ -102,6 +107,7 @@ void setup() {
 //================ START OF LOOP  ===============================================
 void loop() {
 
+  
   //========start of loop for neopixels=========================================
   // Set the color of the first pixel to red
   pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Red
@@ -132,25 +138,21 @@ void loop() {
   }
 
   // Measure distance to nearby objects us bing the ultrasonic sensor
-  long duration, distance;
-  digitalWrite(Trig, LOW);
-  delayMicroseconds(2);
-  digitalWrite(Trig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(Trig, LOW);
-  duration = pulseIn(Echo, HIGH);
-  distance = duration * 0.034 / 2;
+  
+ unsigned long time1 = millis();
+  
+  if( time1 > 10000) 
+  {
+ distanceMeasure();
+  }
 
-  // Print distance sensor readings
-  Serial.print(distance);
-  Serial.print("cm");
-  Serial.println();
-
+  
   if (distance < 13 ) {
+    Serial.println("Long sentence to see iif this function gets triggered easily");
     avoidObstacle();
     findLine();
   }
-
+  
   // Read the sensor values
   int sensor1 = analogRead(sensorPin1);
   int sensor2 = analogRead(sensorPin2);
@@ -229,7 +231,7 @@ void avoidObstacle() {
   int drive2Duration = 500;
 
   // Turn left for turnDuration milliseconds
-  int startTime = millis();
+  unsigned long startTime = millis();
   while (millis() - startTime < turnDuration) {
     turnLeftObstacle(); // It turns left somehow
   }
@@ -465,5 +467,23 @@ void endLine() {
   delay(50);
   endLineCounter++;
 }
+
+
+void distanceMeasure()
+{
+  
+  digitalWrite(Trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(Trig, LOW);
+  duration = pulseIn(Echo, HIGH);
+  distance = duration * 0.034/2;
+  Serial.println(distance);
+    // Print distance sensor readings
+}
+
+
+
 
 //================ END FUNCTION DECLARATIONS  ===============================================
