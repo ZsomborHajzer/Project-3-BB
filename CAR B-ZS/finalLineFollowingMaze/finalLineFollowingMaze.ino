@@ -444,7 +444,7 @@ void startProgramFun()
 {
   carStop();
   openGripper();
-  wait(1000);
+  wait(2000);
   resetCounters();
 
   while (countLW < 39)
