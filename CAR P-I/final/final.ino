@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /*
     pins definition
 
@@ -12,8 +10,11 @@
 
     fProxEcho / fProxTrig - front proximity sensor echo / trigger
     lProxEcho / lProxTrig - proximity sensor on the left side, echo / trigger
+
+    servo - servo pin
+
+    ir1-ir6 - IR sensors starting from the left side
 */
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
 
 #define RWF 6
 #define RWB 5
@@ -30,44 +31,34 @@
 #define lProxEcho 7
 #define lProxTrig 8
 
-<<<<<<< HEAD
-float forwardDistance = 0;
-float leftDistance = 0;
-bool goingForward = false;
+#define servo 4
 
-unsigned long countRW = 0;
-unsigned long countLW = 0;
+#define ir1 A5
+#define ir2 A4
+#define ir3 A3
+#define ir4 A2
+#define ir5 A1
+#define ir6 A0
 
+int irSensors[6] = {ir1, ir2, ir3, ir4, ir5, ir6};
+boolean irValues[6];
 
-void setup()
-{
-
-    Serial.begin(9600);
-    pinMode(RWF,OUTPUT);
-    pinMode(RWB,OUTPUT);
-    pinMode(LWF,OUTPUT);
-    pinMode(LWB,OUTPUT);
-    
-=======
 float forwardDistance = .0f;
 float leftDistance = .0f;
 
-unsigned int countRW = 0;
-unsigned int countLW = 0;
+boolean waitingStart = true;
+boolean startSequence = false;
+boolean endDetected = false;
+
+boolean turnedRight = false;
+
+volatile int countRW = 0;
+volatile int countLW = 0;
 
 void setup()
 {
     Serial.begin(9600);
 
-    // can be left out as it does nothing
-
-    // pinMode(RWF, OUTPUT);
-    // pinMode(RWB, OUTPUT);
-
-    // pinMode(LWF, OUTPUT);
-    // pinMode(LWB, OUTPUT);
-
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
     pinMode(fProxEcho, INPUT);
     pinMode(fProxTrig, OUTPUT);
 
@@ -76,78 +67,118 @@ void setup()
 
     pinMode(encoderRW, INPUT);
     pinMode(encoderLW, INPUT);
-<<<<<<< HEAD
+
     attachInterrupt(digitalPinToInterrupt(encoderRW), updateRW, CHANGE);
     attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
-  
-}
 
-//===================================|| MAZE GO STRAIGHT FUNCTION || =======================
-void goForwardToWall()
-{
-    if (leftDistance > 9.2)
+    // this initialises the gripper
+    for (int i = 0; i < 4; i++)
     {
-        analogWrite(RWF, 255);
-        // analogWrite(LWF, 232 - 10 * (leftDistance - 7));
-        analogWrite(LWF, 192);
+        gripOpen();
     }
-    else if (leftDistance < 7.2)
-    {
-        analogWrite(RWF, 205);
-        // analogWrite(RWF, 255 - 10 * abs(leftDistance - 4));
-        analogWrite(LWF, 232);
-=======
 
-    attachInterrupt(digitalPinToInterrupt(encoderRW), updateRW, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(encoderLW), updateLW, CHANGE);
+    gripOpen();
 }
 
 void loop()
 {
-    querySensors();
+    // the code for awaiting the start;
+    // if the robot sees an object in front of it, it starts
+    if (waitingStart)
+    {
+        querySensors();
+        if (forwardDistance < 25)
+        {
+            waitingStart = false;
+            startSequence = true;
+        }
 
-    if (leftDistance > 25)
+        return wait(100);
+    }
+
+    // the start itself;
+    // the robot ought to move, pick up the stick,
+    // turn left, and move forward
+    if (startSequence)
+    {
+        wait(2000);
+
+        goForwardInTicks(55);
+        wait(250);
+
+        gripClose();
+        wait(250);
+
+        basicTurnLeft();
+        wait(250);
+
+        goForwardInTicks(40);
+
+        startSequence = false;
+
+        return wait(250);
+    }
+
+    endDetected = allBlack();
+
+    // end sequence
+    if (endDetected)
     {
         stop();
+        gripOpen();
         wait(150);
+        goBackwardInTicks(20);
+        wait(150);
+        gripClose();
+        while (true)
+            ;
+    }
+
+    // the main sequence
+
+    querySensors();
+
+    if (leftDistance > 30)
+    {
         return performLeftTurn();
     }
 
-    goForward();
+    if (leftDistance < 25 && forwardDistance < 12)
+    {
+        return performRightTurn();
+    }
+
+    return goForward();
 }
 
 // movement functions
 
 void goForward()
 // the function defines the behaviour of the car when it is going forward
-// it adjusts the car so that it is constantly 8.2 cm away from the wall
+// it adjusts the car so that it is constantly around 8.2 cm away from the wall
 {
-    if (leftDistance > 4)
+    if (leftDistance > 9.2)
     {
         analogWrite(RWF, 255);
         analogWrite(LWF, 180);
     }
-    else if (leftDistance < 3)
+    else if (leftDistance < 7.2)
     {
-        // TODO: should be reviewed as the left wheel is not using max speed
         analogWrite(RWF, 225);
         analogWrite(LWF, 255);
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
     }
     else
     {
         analogWrite(RWF, 255);
         analogWrite(LWF, 232);
     }
+
+    turnedRight = false;
+
+    endDetected = allBlack();
 }
 
-<<<<<<< HEAD
-
-//===================================|| END OF MAZE GO STRAIGHT FUNCTION || =======================
-
-//===================================|| ENCODER FUNCTIONS || ======================================
-=======
-void goInTicks(int ticks)
+void goForwardInTicks(int ticks)
 // moves the car forward for a given number of ticks
 {
     resetCounters();
@@ -156,48 +187,156 @@ void goInTicks(int ticks)
     {
         analogWrite(RWF, 255);
         analogWrite(LWF, 232);
-
-        // Serial.println(String(countRW) + "/" + String(ticks));
-        Serial.println("");
     }
+
+    turnedRight = false;
+
+    endDetected = allBlack();
+
+    stop();
+    gripClose();
+}
+
+void goBackwardInTicks(int ticks)
+{
+    resetCounters();
+
+    while (countRW < ticks)
+    {
+        analogWrite(RWB, 255);
+        analogWrite(LWB, 242);
+    }
+
+    turnedRight = false;
 
     stop();
 }
 
 void performLeftTurn()
 {
-    goInTicks(15);
+    goForwardInTicks(20);
     wait(300);
 
     basicTurnLeft();
-    wait(300);
+    wait(150);
 
-    goInTicks(10);
+    querySensors();
+    if (forwardDistance > 25)
+    {
+        goForwardInTicks(20);
+    }
+
+    turnedRight = false;
+
+    return wait(150);
 }
+
+void performRightTurn()
+{
+    stop();
+    wait(150);
+
+    if (leftDistance < 6 || turnedRight)
+    {
+        basicTurnRight();
+        turnedRight = true;
+    }
+    else
+    {
+        adjustToWall();
+    }
+
+    wait(150);
+
+    querySensors();
+    if (forwardDistance > 15)
+    {
+        wait(100);
+        goForwardInTicks(25);
+    }
+
+    return wait(150);
+}
+
+void adjustToWall()
+// while performing a right turn, the car might need
+// to be adjusted to the wall
+{
+    stop();
+    resetCounters();
+
+    while (countRW < 10)
+    {
+        analogWrite(RWB, 255);
+    }
+
+    stop();
+
+    resetCounters();
+    while (countRW < 12)
+    {
+        analogWrite(RWB, 235);
+        analogWrite(LWB, 255);
+    }
+
+    stop();
+
+    resetCounters();
+    while (countRW < 12)
+    {
+        analogWrite(RWF, 255);
+    }
+
+    stop();
+
+    resetCounters();
+    while (countRW < 8)
+    {
+        analogWrite(RWF, 255);
+        analogWrite(LWF, 255);
+    }
+
+    stop();
+
+    resetCounters();
+}
+
+// basic movement functions;
+// those are that actually do the movement
+// as an example, basicTurnLeft() turns the car left by 90 degrees
 
 void stop()
 {
     analogWrite(RWF, 0);
     analogWrite(RWB, 0);
+
     analogWrite(LWF, 0);
     analogWrite(LWB, 0);
 }
-
-// basic movement functions
-// they are simple functions to turn precisely
 
 void basicTurnLeft()
 {
     stop();
 
     resetCounters();
-    while (countLW < 14)
+    while (countRW < 17)
     {
         analogWrite(RWF, 255);
-        analogWrite(LWB, 254);
+        analogWrite(LWB, 255);
+    }
 
-        // Serial.println(String(countLW) + "/" + String(14));
-        Serial.println("");
+    stop();
+}
+
+void basicTurnRight()
+{
+    stop();
+
+    resetCounters();
+    while (countLW < 17)
+    {
+        analogWrite(LWF, 255);
+        analogWrite(RWB, 255);
     }
 
     stop();
@@ -206,11 +345,10 @@ void basicTurnLeft()
 // counter functions
 // used to update the counters of the encoders
 
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
 void updateRW()
 {
     noInterrupts();
-    countRW = countRW + 1;
+    countRW++;
     interrupts();
 }
 
@@ -221,49 +359,23 @@ void updateLW()
     interrupts();
 }
 
-void printEncoderMesurements()
-<<<<<<< HEAD
-{
-    Serial.print("Right Wheel: ");
-    Serial.print(countRW);
-    Serial.print(" , ");
-    Serial.print("Left Wheel: ");
-    Serial.println(countLW);
-=======
-// TODO: be removed on release
-{
-    Serial.println("Left wheel: " + String(countLW) + ", right wheel:" + String(countRW));
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
-}
-
 void resetCounters()
 {
     countRW = 0;
     countLW = 0;
 }
 
-<<<<<<< HEAD
-//===================================|| END OF ENCODER FUNCTIONS|| ================================
-
-//===================================|| DISTANCE MEASUREMENT SENSORS|| ============================
-void querySensors()
-=======
 // sound sensors functions
 
 void querySensors()
-// TODO: might be optimised as the sensors always get queried together
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
 {
     forwardDistance = getForwardDistance();
     leftDistance = getLeftDistance();
 }
 
 float pulse(int proxTrig, int proxEcho)
-<<<<<<< HEAD
-=======
-// might be renamed as it returns the distance in cm
-// TODO: also might be optimised as the sensors always get queried together
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
+// sends the pulse;
+// needs to be supplied with trigger and echo pins
 {
     digitalWrite(proxTrig, HIGH);
     delayMicroseconds(10);
@@ -275,40 +387,68 @@ float pulse(int proxTrig, int proxEcho)
 }
 
 float getForwardDistance()
-<<<<<<< HEAD
-=======
 // returns forward distance in cm
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
 {
     return round(pulse(fProxTrig, fProxEcho) * 100.0) / 100.0;
 }
 
 float getLeftDistance()
-<<<<<<< HEAD
-{
-    return round(pulse(lProxTrig, lProxEcho) * 100.0) / 100.0;
-}
-//===================================|| END OF DISTANCE MEASUREMENTS || ===========================
-
-void loop()
-{
-    querySensors();
-    goForwardToWall();
-=======
 // returns left distance in cm
 {
     return round(pulse(lProxTrig, lProxEcho) * 100.0) / 100.0;
 }
 
+// IR sensors functions
+
+void queryIRSensors()
+// the function sets irValues[] to the actual values
+{
+    for (int i = 0; i < 6; i++)
+    {
+        irValues[i] = analogRead(irSensors[i]) > 800;
+    }
+}
+
+boolean allBlack()
+{
+    short sum = 0;
+
+    queryIRSensors();
+    for (int i = 0; i < 6; i++)
+    {
+        if (irValues[i])
+        {
+            sum++;
+        };
+    }
+
+    return sum == 6;
+}
+
 // other functions
+
+void gripOpen()
+{
+    digitalWrite(servo, HIGH);
+    delayMicroseconds(2000);
+    digitalWrite(servo, LOW);
+    delay(10);
+}
+
+void gripClose()
+{
+    digitalWrite(servo, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(servo, LOW);
+    delay(10);
+}
 
 void wait(int timeToWait)
 // waits for an amount of time in milliseconds
-// used to eliminate the need to use the delay() function
+// used to eliminate the need of using the delay() function
 {
     long time = millis();
 
     while (millis() < time + timeToWait)
         ;
->>>>>>> 072727ed2f605ac2a4ec67c3fbebbee5af411efb
 }
