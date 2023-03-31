@@ -45,7 +45,7 @@ boolean startProgram = true;
 
 int trigPin = 8;    // Trigger
 int echoPin = 4;    // Echo
-volatile long duration, cm;
+volatile unsigned long duration, cm = 40;
 
 //==============================================================================
 
