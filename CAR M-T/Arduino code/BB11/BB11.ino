@@ -1,8 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 #include <Servo.h>
 
-
-
 // ================ start of Neopixels pins====================
 #define PIN 13          // Set the pin for NeoPixel data input
 #define NUM_PIXELS 4    // Set the number of pixels in your NeoPixel strip
@@ -42,7 +40,7 @@ Servo gripper;
 int gripperPin = 12;
 int pinServo = 12;
 
-//Set the int needed
+// Set the int needed
 int s0;
 int s1;
 int s2;
@@ -67,7 +65,7 @@ const int motorSpeed = 255;
 // Define the threshold for detecting the black line
 const int threshold = 800;
 
-// some functions declaration
+// Some functions declaration
 bool startLineFunctionExecuted = false;
 bool endLineFunctionExecuted = false;
 
@@ -105,7 +103,7 @@ void setup() {
 void loop() {
 
 
-  // ========start of loop for neopixels=====================================================
+  // ========start of loop for neopixels====================================================
   // Set the color of the first pixel to red
   pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Red
 
@@ -242,16 +240,16 @@ void avoidObstacle() {
   startTime = millis();
   while (millis() - startTime < turn2Duration) {
     turnRightObstacle();
-    //Turn right for short amount of time
+    // Turn right for short amount of time
   }
 }
 
 // function needed to find line
 void findLine() {
 
-  int lineDetector = 0;
+  int linedetector = 0;
 
-  while (lineDetector == 0) {
+  while (linedetector == 0) {
 
     int sensor1 = analogRead(sensorPin1);
     int sensor2 = analogRead(sensorPin2);
@@ -267,14 +265,14 @@ void findLine() {
     // go forward until it detects line
 
     if (sensor1 > 700 || sensor2 > 700 || sensor3 > 700 || sensor4 > 700 || sensor5 > 700 || sensor6 > 700 || sensor7 > 700 || sensor8 > 700) {
-      lineDetector = 1;
+      linedetector = 1;
     }
   }
 }
 
-// ================ END OF LOOP  ====================================================================================================================================================
+//================ END OF LOOP  ===============================================================
 
-// ================ START FUNCTION DECLARATIONS  ====================================================================================================================================
+//================ START FUNCTION DECLARATIONS  ===============================================
 // Function definition for moving forward
 void goForward() {
   if (counter1 <= inter && counter2 <= inter) {
@@ -401,7 +399,7 @@ void startLine() {
   delay(500);
 
   closeGripper();
-  LeftTurn ();
+  LeftTurn();
   moveForward();
   delay(50);
 }
@@ -483,6 +481,5 @@ void distanceMeasure()
   Serial.println(distance);
   // Print distance sensor readings
 }
-
 
 // ================ END FUNCTION DECLARATIONS  ====================================================================================================================================
