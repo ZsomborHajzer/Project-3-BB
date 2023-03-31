@@ -1,12 +1,9 @@
-
-//INCLUDED LIBRARIES
-
 #include <Adafruit_NeoPixel.h>
 #include <Servo.h>
 
 
 
-//================ start of Neopixels pins====================
+// ================ start of Neopixels pins====================
 #define PIN 13          // Set the pin for NeoPixel data input
 #define NUM_PIXELS 4    // Set the number of pixels in your NeoPixel strip
 
@@ -70,14 +67,14 @@ const int motorSpeed = 255;
 // Define the threshold for detecting the black line
 const int threshold = 800;
 
-//some functions declaration
+// some functions declaration
 bool startLineFunctionExecuted = false;
 bool endLineFunctionExecuted = false;
 
 
 unsigned long time, lasttime;
 
-//================ START OF SETUP  =========================================================
+// ================ START OF SETUP  =========================================================
 void setup() {
   // Initialize the serial communication
   Serial.begin(9600);
@@ -102,13 +99,13 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(interruptPin2), counterRight, CHANGE);
 }
 
-//================ END OF SETUP  ==========================================================
+// ================ END OF SETUP  ==========================================================
 
-//================ START OF LOOP  =========================================================
+// ================ START OF LOOP  =========================================================
 void loop() {
 
-  
-  //========start of loop for neopixels=====================================================
+
+  // ========start of loop for neopixels=====================================================
   // Set the color of the first pixel to red
   pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Red
 
@@ -125,7 +122,7 @@ void loop() {
   pixels.show();
 
   //======== end of loop for neopixels=========================================================
-  
+
   if (!startLineFunctionExecuted) {
 
     startLine();
@@ -138,21 +135,21 @@ void loop() {
   }
 
   // Measure distance to nearby objects us bing the ultrasonic sensor
-  
- unsigned long time1 = millis();
-  
-  if( time1 > 10000) 
+
+  unsigned long time1 = millis();
+
+  if ( time1 > 10000)
   {
- distanceMeasure();
+    distanceMeasure();
   }
 
-  
+
   if (distance < 13 ) {
     Serial.println("Long sentence to see iif this function gets triggered easily");
     avoidObstacle();
     findLine();
   }
-  
+
   // Read the sensor values
   int sensor1 = analogRead(sensorPin1);
   int sensor2 = analogRead(sensorPin2);
@@ -245,7 +242,7 @@ void avoidObstacle() {
   startTime = millis();
   while (millis() - startTime < turn2Duration) {
     turnRightObstacle();
- //Turn right for short amount of time
+    //Turn right for short amount of time
   }
 }
 
@@ -275,9 +272,9 @@ void findLine() {
   }
 }
 
-//================ END OF LOOP  ====================================================================================================================================================
+// ================ END OF LOOP  ====================================================================================================================================================
 
-//================ START FUNCTION DECLARATIONS  ====================================================================================================================================
+// ================ START FUNCTION DECLARATIONS  ====================================================================================================================================
 // Function definition for moving forward
 void goForward() {
   if (counter1 <= inter && counter2 <= inter) {
@@ -426,7 +423,7 @@ void moveBack() {
   analogWrite(rightMotorPin2, 255);
 }
 
-//Function definition to Turn left
+// Function definition to Turn left
 void LeftTurn() {
   analogWrite(leftMotorPin1, 150);
   analogWrite(leftMotorPin2, 0);
@@ -435,7 +432,7 @@ void LeftTurn() {
   delay(1000);
 }
 
-//Function definition to close Gripper
+// Function definition to close Gripper
 // forloop 8-10x
 void closeGripper()
 {
@@ -448,7 +445,7 @@ void closeGripper()
   }
 }
 
-//Function definition to open Gripper
+// Function definition to open Gripper
 void openGripper()
 {
   for (int i = 0; i < 10; i++)
@@ -460,7 +457,7 @@ void openGripper()
   }
 }
 
-//Function definition for dropping the cone and moving backwards
+// Function definition for dropping the cone and moving backwards
 void endLine() {
   openGripper();
   delay(500);
@@ -475,19 +472,17 @@ void endLine() {
 // Function needed to read ultra-sonic sensor values
 void distanceMeasure()
 {
-  
+
   digitalWrite(Trig, LOW);
   delayMicroseconds(2);
   digitalWrite(Trig, HIGH);
   delayMicroseconds(10);
   digitalWrite(Trig, LOW);
   duration = pulseIn(Echo, HIGH);
-  distance = duration * 0.034/2;
+  distance = duration * 0.034 / 2;
   Serial.println(distance);
-    // Print distance sensor readings
+  // Print distance sensor readings
 }
 
 
-
-
-//================ END FUNCTION DECLARATIONS  ====================================================================================================================================
+// ================ END FUNCTION DECLARATIONS  ====================================================================================================================================
