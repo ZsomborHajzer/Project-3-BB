@@ -82,7 +82,7 @@ void setup()
 
 void loop()
 {
-    // the code for awaiting the start
+    // the code for awaiting the start;
     // if the robot sees an object in front of it, it starts
     if (waitingStart)
     {
@@ -96,12 +96,12 @@ void loop()
         return wait(100);
     }
 
-    // the start itself
+    // the start itself;
     // the robot ought to move, pick up the stick,
     // turn left, and move forward
     if (startSequence)
     {
-        wait(4000);
+        wait(2000);
 
         goForwardInTicks(55);
         wait(250);
@@ -112,7 +112,7 @@ void loop()
         basicTurnLeft();
         wait(250);
 
-        goForwardInTicks(50);
+        goForwardInTicks(40);
 
         startSequence = false;
 
@@ -121,12 +121,14 @@ void loop()
 
     endDetected = allBlack();
 
+    // end sequence
     if (endDetected)
     {
+        stop();
         gripOpen();
-        delay(150);
+        wait(150);
         goBackwardInTicks(20);
-        delay(150);
+        wait(150);
         gripClose();
         while (true)
             ;
@@ -136,7 +138,7 @@ void loop()
 
     querySensors();
 
-    if (leftDistance > 25)
+    if (leftDistance > 30)
     {
         return performLeftTurn();
     }
@@ -153,7 +155,7 @@ void loop()
 
 void goForward()
 // the function defines the behaviour of the car when it is going forward
-// it adjusts the car so that it is constantly 8.2 cm away from the wall
+// it adjusts the car so that it is constantly around 8.2 cm away from the wall
 {
     if (leftDistance > 9.2)
     {
@@ -174,7 +176,6 @@ void goForward()
     turnedRight = false;
 
     endDetected = allBlack();
-    // gripClose();
 }
 
 void goForwardInTicks(int ticks)
@@ -238,11 +239,11 @@ void performRightTurn()
     if (leftDistance < 6 || turnedRight)
     {
         basicTurnRight();
+        turnedRight = true;
     }
     else
     {
         adjustToWall();
-        turnedRight = true;
     }
 
     wait(150);
@@ -252,15 +253,14 @@ void performRightTurn()
     {
         wait(100);
         goForwardInTicks(25);
-        turnedRight = true;
     }
 
     return wait(150);
 }
 
+void adjustToWall()
 // while performing a right turn, the car might need
 // to be adjusted to the wall
-void adjustToWall()
 {
     stop();
     resetCounters();
@@ -301,7 +301,7 @@ void adjustToWall()
     resetCounters();
 }
 
-// basic movement functions
+// basic movement functions;
 // those are that actually do the movement
 // as an example, basicTurnLeft() turns the car left by 90 degrees
 
@@ -368,15 +368,14 @@ void resetCounters()
 // sound sensors functions
 
 void querySensors()
-// TODO: might be optimised as the sensors always get queried together
 {
     forwardDistance = getForwardDistance();
     leftDistance = getLeftDistance();
 }
 
 float pulse(int proxTrig, int proxEcho)
-// might be renamed as it returns the distance in cm
-// TODO: also might be optimised as the sensors always get queried together
+// sends the pulse;
+// needs to be supplied with trigger and echo pins
 {
     digitalWrite(proxTrig, HIGH);
     delayMicroseconds(10);
@@ -430,29 +429,23 @@ boolean allBlack()
 
 void gripOpen()
 {
-    // for (int i = 0; i < 10; i++)
-    // {
     digitalWrite(servo, HIGH);
     delayMicroseconds(2000);
     digitalWrite(servo, LOW);
     delay(10);
-    // }
 }
 
 void gripClose()
 {
-    // for (int i = 0; i < 10; i++)
-    // {
     digitalWrite(servo, HIGH);
     delayMicroseconds(1000);
     digitalWrite(servo, LOW);
     delay(10);
-    // }
 }
 
 void wait(int timeToWait)
 // waits for an amount of time in milliseconds
-// used to eliminate the need to use the delay() function
+// used to eliminate the need of using the delay() function
 {
     long time = millis();
 
